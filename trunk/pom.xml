@@ -49,21 +49,6 @@
 		</plugins>
 	</build>
 	
-<!--
-	<distributionManagement>
-		<repository>
-			<id>repository</id>
-			<name>glite</name>
-			<url>file:///home/ketan/.m2/repository/</url>
-		</repository>
-		<snapshotRepository>
-			<id>snapshot-repository</id>
-			<name>glite</name>
-			<url>file:///home/ketan/.m2/repository/</url>
-		</snapshotRepository>
-	</distributionManagement>
--->
-
 	<dependencies>
 		<dependency>
 			<groupId>net.sf.taverna.t2</groupId>
