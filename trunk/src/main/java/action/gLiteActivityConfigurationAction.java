@@ -1,3 +1,4 @@
+//Activity ConfigAction!!
 package action;
 
 import gLite.gLiteActivity;
