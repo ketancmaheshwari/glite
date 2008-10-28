@@ -1094,29 +1094,24 @@ public class gLiteConfigView extends JPanel {
 					activityInputPortDefinitionBean.setName(inputView.getNameField().getText());
 					inputBeanList.add(activityInputPortDefinitionBean);
 				}
-				/*
-				 * List<ActivityOutputPortDefinitionBean> outputBeanList = new
-				 * ArrayList<ActivityOutputPortDefinitionBean>(); for
-				 * (gLiteOutputViewer outputView : outputViewList) {
-				 * ActivityOutputPortDefinitionBean
-				 * activityOutputPortDefinitionBean = new
-				 * ActivityOutputPortDefinitionBean();
-				 * activityOutputPortDefinitionBean .setDepth((Integer)
-				 * outputView.getDepthSpinner() .getValue());
-				 * activityOutputPortDefinitionBean .setGranularDepth((Integer)
-				 * outputView .getGranularDepthSpinner().getValue());
-				 * activityOutputPortDefinitionBean.setName(outputView
-				 * .getNameField().getText());
-				 * activityOutputPortDefinitionBean.setMimeTypes(outputView
-				 * .getMimeTypeConfig().getMimeTypeList()); //
-				 * outputView.getMimeTypeConfig().getMimeTypeList();
-				 * 
-				 * // Edits edits = EditsRegistry.getEdits();
-				 * 
-				 * // FIXME add all the mime types as an annotation
-				 * 
-				 * outputBeanList.add(activityOutputPortDefinitionBean); }
-				 */
+				
+				  List<ActivityOutputPortDefinitionBean> outputBeanList = new ArrayList<ActivityOutputPortDefinitionBean>();
+				  for (gLiteOutputViewer outputView : outputViewList) {
+					  ActivityOutputPortDefinitionBean activityOutputPortDefinitionBean = new ActivityOutputPortDefinitionBean();
+				  
+					  activityOutputPortDefinitionBean.setDepth((Integer)outputView.getDepthSpinner() .getValue());
+					  activityOutputPortDefinitionBean.setGranularDepth((Integer) outputView .getGranularDepthSpinner().getValue());
+					  activityOutputPortDefinitionBean.setName(outputView.getNameField().getText());
+					  activityOutputPortDefinitionBean.setMimeTypes(outputView.getMimeTypeConfig().getMimeTypeList());
+					  
+					  outputView.getMimeTypeConfig().getMimeTypeList();
+				  
+				  // Edits edits = EditsRegistry.getEdits();
+				  // FIXME add all the mime types as an annotation
+				  
+					  outputBeanList.add(activityOutputPortDefinitionBean);
+				  }
+				 
 				gLiteActivityConfigurationBean gliteActivityConfigurationBean = new gLiteActivityConfigurationBean();
 				gliteActivityConfigurationBean.setJdlconfigbean(new JDLConfigBean());
 				//set glb		
@@ -1142,31 +1137,14 @@ public class gLiteConfigView extends JPanel {
 				gliteActivityConfigurationBean.setVOMSCertDir(jTextFieldVOMSCertDir.getText());
 				gliteActivityConfigurationBean.setWMSDir(jTextFieldWMSDir.getText());
 				
-			/*	try {
-					JDLfilepath=createJDL(gliteActivityConfigurationBean);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				
-				try {
-					String wrapper=gLiteConfigView.createWrapper(gliteActivityConfigurationBean);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-				*/
-				
 				gliteActivityConfigurationBean.setJDLPath(JDLfilepath);
 				
 				gliteActivityConfigurationBean.setOutputPath(jTextFieldOutputPath.getText());
 				gliteActivityConfigurationBean.setPollFrequency(jTextFieldPollFrequency.getText());				
 				
 				gliteActivityConfigurationBean.setInputPortDefinitions(inputBeanList);
-				/*
-				 * gliteActivityConfigurationBean
-				 * .setOutputPortDefinitions(outputBeanList);
-				 */
+
+				gliteActivityConfigurationBean.setOutputPortDefinitions(outputBeanList);				 
 
 				configuration = gliteActivityConfigurationBean;
 				configChanged = true;

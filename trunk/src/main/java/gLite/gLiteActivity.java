@@ -1,5 +1,6 @@
 package gLite;
 
+import java.util.Random;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -40,6 +41,8 @@ public class gLiteActivity extends
 	private gLiteActivityConfigurationBean configurationBean;
 	private String outputDir;
 	private static String[]  wfinput;
+	private static HashMap<String, String> datanamemap = new HashMap<String, String>();
+	
 	@Override
 	public void configure(gLiteActivityConfigurationBean configurationBean)
 			throws ActivityConfigurationException {
@@ -79,6 +82,7 @@ public class gLiteActivity extends
 				try {
 					// set inputs
 					int i=0;
+					
 					for (String inputName : data.keySet()) {
 						ActivityInputPort inputPort = getInputPort(inputName);
 						input = referenceService.renderIdentifier(data
@@ -87,14 +91,19 @@ public class gLiteActivity extends
 								.getContext());
 						inputName = sanatisePortName(inputName);
 						  wfinput[i]=input.toString();
+						  datanamemap.put(wfinput[i], getRandomString());
 						//If inputName starts with 'file' call commands to transfer it to ui
-						if(input.toString().substring(0, 4).equals("file")){
-							wfinput[i]=input.toString().substring(4);
-							Runtime.getRuntime().exec("scp /home/ketan/ManchesterWork/gliteworkflows/inputs/"+ wfinput+ " glite.unice.fr:");
+						if(/*first part is local and second part is data*/getPart(wfinput[1], 1).equals("local")&&getPart(wfinput[i],2).equals("data")){
+							wfinput[i]=getPart(wfinput[i],3);
+							Runtime.getRuntime().exec("scp /home/ketan/ManchesterWork/gliteworkflows/inputs/"+ wfinput[i]+ " glite.unice.fr:");
 							//Transfer this to grid
 							Runtime.getRuntime().exec("ssh glite.unice.fr lcg-del -a lfn:"+wfinput[i]);
-							//Runtime.getRuntime().exec("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" +wfinput+ " -d tbn15.nikhef.nl file://`pwd`/"+ wfinput);
-							Runtime.getRuntime().exec("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" +wfinput[i]+ " -d prod-se-01.pd.infn.it file://`pwd`/"+ wfinput[i]);
+							
+							//upload the data on the grid with a random name using getRandomString
+							Runtime.getRuntime().exec("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" +datanamemap.get(wfinput[i])+ " -d prod-se-01.pd.infn.it file://`pwd`/"+ wfinput[i]);
+						}else if(getPart(wfinput[i], 2).equals("string")){
+							// portvalue=thirdpart
+							wfinput[i]=getPart(wfinput[i], 3);
 						}
 						i++;
 					}
@@ -265,13 +274,14 @@ public class gLiteActivity extends
 	}
 	
 	public static String createWrapper(gLiteActivityConfigurationBean glb) throws IOException{
+		
 		File wrapperfile = new File(glb.getJdlconfigbean().getInputsPath(),"wrapper_"+System.currentTimeMillis()+".sh");
 		PrintWriter f = new PrintWriter(new FileWriter(wrapperfile));
 		f.println("#!/bin/sh");
 		f.println("export LFC_HOME=lfc-biomed.in2p3.fr:/grid/biomed/testKetan");
 		f.println();
 		f.println("#Read the starting time");
-		f.println("START=`date +%s`");
+		f.println("DATA_TRANSFER_FROM_GRID_START=`date +%s`");
 		f.println();
 		f.println("#copy data to Workernode");
 
@@ -280,31 +290,58 @@ public class gLiteActivity extends
 			f.println("lcg-cp --vo biomed lfn:"+wfinput[i]+" file://$(pwd)/"+wfinput[i]);	
 		}
 		
+		f.println("DATA_TRANSFER_FROM_GRID_END=`date +%s`");
+		f.println("TIME_TAKEN_FOR_DATA_TRANSFER_FROM_GRID=`expr $DATA_TRANSFER_FROM_GRID_END - $DATA_TRANSFER_FROM_GRID_START`");
+		
 		f.println();
+		f.printf("START=`date %s`");
 		f.println("#export current path and run the executable");
 		f.println("export PATH=.:$PATH");
 		f.println("/bin/chmod 755 "+glb.getJdlconfigbean().getExecutable());
 		f.println(glb.getJdlconfigbean().getExecutable()+" "+ "$*");
 		f.println();
+		f.println("STOP=`date +%s`");
+		f.println("TOTAL=`expr $STOP - $START`");
+		f.println("echo \"Total running time: $TOTAL seconds\"");
+		f.println("DATA_TRANSFER_TO_GRID_START=`date +%s`");
+		
 		for(int i=0;i<wfinput.length;i++){
 			f.println("lcg-del --vo biomed -a lfn:"+wfinput[i]);
 			//introduce a delay for updation of the lcg catalogue
 			f.println("/bin/sleep 3");
-			//f.println("lcg-cr --vo biomed -l lfn:"+wfinput+" -d tbn15.nikhef.nl file://$(pwd)/"+wfinput);
 			f.println("lcg-cr --vo biomed -l lfn:"+wfinput[i]+" -d prod-se-01.pd.infn.it file://$(pwd)/"+wfinput[i]);
 		}
+		
+		f.println("DATA_TRANSFER_TO_GRID_END=`date +%s`");
+		
+		f.println("TIME_TAKEN_FOR_DATA_TRANSFER_TO_GRID=`expr $DATA_TRANSFER_TO_GRID_END - $DATA_TRANSFER_TO_GRID_START`");
+		
+		f.printf("TOTAL_DATA_TRANSFER_TIME=`expr $TIME_TAKEN_FOR_DATA_TRANSFER_FROM_GRID + $TIME_TAKEN_FOR_DATA_TRANSFER_TO_GRID`");
+		
+		f.println("echo \"Total data transfer time: $TOTAL_DATA_TRANSFER_TIME seconds. \"");
 		f.println("#Create the file outdata.txt");
 		f.println("touch outdata.txt");
 		//copy the outputdata link to this file
 		f.println("echo "+wfinput+" >outdata.txt");
 		f.println();
-		f.println("#Read the ending time");
-		f.println("STOP=`date +%s`");
-		f.println("#Compute and print the difference which will be the execution time");
-		f.println("TOTAL=`expr $STOP - $START`");
-		f.println("echo \"Total running time: $TOTAL seconds\"");
-		f.println();
 		f.close();
 		return wrapperfile.getName();
+	}
+	
+	public static String getPart(String s,int n){
+
+		java.util.StringTokenizer st = new java.util.StringTokenizer(s, ":");
+		int i=1;
+		while(st.hasMoreTokens()){
+			String token=st.nextToken();
+			if(i==n)return token;
+			i++;
+		}
+		return null;
+	}
+	
+	public static String getRandomString(){
+		Random r = new Random(System.currentTimeMillis());
+	    return Long.toString(Math.abs(r.nextLong()), 36).substring(0,5);
 	}
 }
