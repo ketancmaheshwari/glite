@@ -1018,6 +1018,8 @@ public class gLiteConfigView extends JPanel {
 						public void actionPerformed(ActionEvent e) {
 							outputViewList.remove(gliteOutputViewer);
 							outputEditPanel.remove(nameField);
+							outputEditPanel.remove(depthSpinner);
+							outputEditPanel.remove(granularDepthSpinner);
 							outputEditPanel.remove(removeButton);
 							outputEditPanel.revalidate();
 						}
