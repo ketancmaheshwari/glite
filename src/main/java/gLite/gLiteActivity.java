@@ -40,7 +40,7 @@ public class gLiteActivity extends
 	private static	Object input;
 	private gLiteActivityConfigurationBean configurationBean;
 	private String outputDir;
-	private static String[]  wfinput;
+	private static ArrayList<String>  wfinput;
 	private static HashMap<String, String> datanamemap = new HashMap<String, String>();
 	
 	@Override
@@ -75,13 +75,13 @@ public class gLiteActivity extends
 		callback.requestRun(new Runnable() {
 
 			public void run() {
-				ReferenceService referenceService = callback.getContext()
-						.getReferenceService();
+				ReferenceService referenceService = callback.getContext().getReferenceService();
 
 				Map<String, T2Reference> outputData = new HashMap<String, T2Reference>();
 				try {
 					// set inputs
 					int i=0;
+					wfinput=new ArrayList<String>();
 					
 					for (String inputName : data.keySet()) {
 						ActivityInputPort inputPort = getInputPort(inputName);
@@ -90,20 +90,20 @@ public class gLiteActivity extends
 								.getTranslatedElementClass(), callback
 								.getContext());
 						inputName = sanatisePortName(inputName);
-						  wfinput[i]=input.toString();
-						  datanamemap.put(wfinput[i], getRandomString());
+						  wfinput.add(i, input.toString());
+						  datanamemap.put(wfinput.get(i), getRandomString());
 						//If inputName starts with 'file' call commands to transfer it to ui
-						if(/*first part is local and second part is data*/getPart(wfinput[1], 1).equals("local")&&getPart(wfinput[i],2).equals("data")){
-							wfinput[i]=getPart(wfinput[i],3);
-							Runtime.getRuntime().exec("scp /home/ketan/ManchesterWork/gliteworkflows/inputs/"+ wfinput[i]+ " glite.unice.fr:");
+						if(/*first part is local and second part is data*/getPart(wfinput.get(i), 1).equals("local")&&getPart(wfinput.get(i),2).equals("data")){
+							wfinput.add(i,getPart(wfinput.get(i),3));
+							Runtime.getRuntime().exec("scp /home/ketan/ManchesterWork/gliteworkflows/inputs/"+ wfinput.get(i)+ " glite.unice.fr:");
 							//Transfer this to grid
-							Runtime.getRuntime().exec("ssh glite.unice.fr lcg-del -a lfn:"+wfinput[i]);
+							Runtime.getRuntime().exec("ssh glite.unice.fr lcg-del -a lfn:"+wfinput.get(i));
 							
 							//upload the data on the grid with a random name using getRandomString
-							Runtime.getRuntime().exec("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" +datanamemap.get(wfinput[i])+ " -d prod-se-01.pd.infn.it file://`pwd`/"+ wfinput[i]);
-						}else if(getPart(wfinput[i], 2).equals("string")){
+							Runtime.getRuntime().exec("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" +datanamemap.get(wfinput.get(i))+ " -d prod-se-01.pd.infn.it file://`pwd`/"+ wfinput.get(i));
+						}else if(getPart(wfinput.get(i), 2).equals("string")&&!getPart(wfinput.get(i), 2).equals(null)){
 							// portvalue=thirdpart
-							wfinput[i]=getPart(wfinput[i], 3);
+							wfinput.add(i,getPart(wfinput.get(i),3));
 						}
 						i++;
 					}
@@ -219,6 +219,7 @@ public class gLiteActivity extends
 					// send result to the callback
 					callback.receiveResult(outputData, new int[0]);
 				} catch (Exception e) {
+					System.err.println("**Exception Occured**");
 					System.err.println(e.getLocalizedMessage());
 					System.err.println(e.getMessage());
 					callback.fail("Exception", e);
@@ -285,16 +286,16 @@ public class gLiteActivity extends
 		f.println();
 		f.println("#copy data to Workernode");
 
-		for(int i=0;i<wfinput.length;i++){
-			f.println("rm -f "+wfinput[i]);
-			f.println("lcg-cp --vo biomed lfn:"+wfinput[i]+" file://$(pwd)/"+wfinput[i]);	
+		for(int i=0;i<wfinput.size();i++){
+			f.println("rm -f "+wfinput.get(i));
+			f.println("lcg-cp --vo biomed lfn:"+wfinput.get(i)+" file://$(pwd)/"+wfinput.get(i));	
 		}
 		
 		f.println("DATA_TRANSFER_FROM_GRID_END=`date +%s`");
 		f.println("TIME_TAKEN_FOR_DATA_TRANSFER_FROM_GRID=`expr $DATA_TRANSFER_FROM_GRID_END - $DATA_TRANSFER_FROM_GRID_START`");
 		
 		f.println();
-		f.printf("START=`date %s`");
+		f.println("START=`date +%s`");
 		f.println("#export current path and run the executable");
 		f.println("export PATH=.:$PATH");
 		f.println("/bin/chmod 755 "+glb.getJdlconfigbean().getExecutable());
@@ -305,18 +306,18 @@ public class gLiteActivity extends
 		f.println("echo \"Total running time: $TOTAL seconds\"");
 		f.println("DATA_TRANSFER_TO_GRID_START=`date +%s`");
 		
-		for(int i=0;i<wfinput.length;i++){
-			f.println("lcg-del --vo biomed -a lfn:"+wfinput[i]);
+		for(int i=0;i<wfinput.size();i++){
+			f.println("lcg-del --vo biomed -a lfn:"+wfinput.get(i));
 			//introduce a delay for updation of the lcg catalogue
 			f.println("/bin/sleep 3");
-			f.println("lcg-cr --vo biomed -l lfn:"+wfinput[i]+" -d prod-se-01.pd.infn.it file://$(pwd)/"+wfinput[i]);
+			f.println("lcg-cr --vo biomed -l lfn:"+wfinput.get(i)+" -d prod-se-01.pd.infn.it file://$(pwd)/"+wfinput.get(i));
 		}
 		
 		f.println("DATA_TRANSFER_TO_GRID_END=`date +%s`");
 		
 		f.println("TIME_TAKEN_FOR_DATA_TRANSFER_TO_GRID=`expr $DATA_TRANSFER_TO_GRID_END - $DATA_TRANSFER_TO_GRID_START`");
 		
-		f.printf("TOTAL_DATA_TRANSFER_TIME=`expr $TIME_TAKEN_FOR_DATA_TRANSFER_FROM_GRID + $TIME_TAKEN_FOR_DATA_TRANSFER_TO_GRID`");
+		f.println("TOTAL_DATA_TRANSFER_TIME=`expr $TIME_TAKEN_FOR_DATA_TRANSFER_FROM_GRID + $TIME_TAKEN_FOR_DATA_TRANSFER_TO_GRID`");
 		
 		f.println("echo \"Total data transfer time: $TOTAL_DATA_TRANSFER_TIME seconds. \"");
 		f.println("#Create the file outdata.txt");

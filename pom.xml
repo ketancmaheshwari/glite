@@ -53,18 +53,12 @@
 		<dependency>
 			<groupId>net.sf.taverna.t2</groupId>
 			<artifactId>workflowmodel-api</artifactId>
-			<version>0.3-SNAPSHOT</version>
-		</dependency>
+			<version>0.3</version>
+		</dependency>		
 		<dependency>
-			<groupId>net.sf.taverna.t2</groupId>
-			<artifactId>data-impl</artifactId>
-			<version>0.3-SNAPSHOT</version>
-		</dependency>
-		
-		<dependency>
-			<groupId>net.sf.taverna.t2</groupId>
+			<groupId>net.sf.taverna.t2.activities</groupId>
 			<artifactId>activity-test-utils</artifactId>
-			<version>0.3-SNAPSHOT</version>
+			<version>0.3</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -74,9 +68,9 @@
 			<scope>test</scope>
 		</dependency>
     <dependency>
-      <groupId>net.sf.taverna.t2</groupId>
+      <groupId>net.sf.taverna.t2.activities</groupId>
       <artifactId>all-activity-uis</artifactId>
-      <version>0.3-SNAPSHOT</version>
+      <version>0.3</version>
     </dependency>
     
     <dependency>

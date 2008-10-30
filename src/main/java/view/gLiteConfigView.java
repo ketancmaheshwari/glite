@@ -1111,7 +1111,7 @@ public class gLiteConfigView extends JPanel {
 				  // Edits edits = EditsRegistry.getEdits();
 				  // FIXME add all the mime types as an annotation
 				  
-					  outputBeanList.add(activityOutputPortDefinitionBean);
+				//	  outputBeanList.add(activityOutputPortDefinitionBean);
 				  }
 				 
 				gLiteActivityConfigurationBean gliteActivityConfigurationBean = new gLiteActivityConfigurationBean();
