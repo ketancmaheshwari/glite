@@ -41,12 +41,12 @@ public class gLiteActivityItem extends AbstractActivityItem{
 	}
 	
 	@Override
-	protected Activity<?> getUnconfiguredActivity() {
+	public Activity<?> getUnconfiguredActivity() {
 		return new gLiteActivity();
 	}
 
 	@Override
-	protected Object getConfigBean() {
+	public Object getConfigBean() {
 		gLiteActivityConfigurationBean bean = new gLiteActivityConfigurationBean();
 		bean.setJdlconfigbean(new JDLConfigBean());
 		/*"https://wms01.egee.cesga.es:7443/glite_wms_wmproxy_server",

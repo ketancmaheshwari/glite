@@ -92,7 +92,7 @@ public class gLiteActivityTest {
 	@Test
 	public void testExecuteAsynch() throws Exception {
 		Map<String, Object> inputs = new HashMap<String, Object>();
-		inputs.put("example_input", "example_input");
+		inputs.put("example_input", "local:string:mystring");
 		Map<String, Class<?>> expectedOutputs = new HashMap<String, Class<?>>();
 		expectedOutputs.put("output", String.class);
 
