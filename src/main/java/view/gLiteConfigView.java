@@ -55,7 +55,7 @@ public class gLiteConfigView extends JPanel {
 	private gLiteActivity activity;
 	/** the configuration bean used to configure the activity */
 	private gLiteActivityConfigurationBean configuration;
-	private gLiteActivityConfigurationBean configBean;
+//	private gLiteActivityConfigurationBean configuration;
 	
 	/**
 	 * Holds the state of the OK button in case a parent view wants to know
@@ -203,7 +203,7 @@ public class gLiteConfigView extends JPanel {
 	private JPanel setPropertiesPanel() {
 		JPanel propertiesPanel = new JPanel();
 
-		configBean = activity.getConfiguration();
+	//	configuration = activity.getConfiguration();
 
 		jLabelVO = new javax.swing.JLabel();
 		jLabelCADir = new javax.swing.JLabel();
@@ -270,105 +270,105 @@ public class gLiteConfigView extends JPanel {
 		GroupLayout layout = new GroupLayout(propertiesPanel);
 		propertiesPanel.setLayout(layout);
 
-		jTextFieldVO.setText(configBean.getVO());
+		jTextFieldVO.setText(configuration.getVO());
 		jTextFieldVO.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.setVO(jTextFieldVO.getText());
+				configuration.setVO(jTextFieldVO.getText());
 			}
 		});
 
-		jTextFieldCADir.setText(configBean.getCaDir());
+		jTextFieldCADir.setText(configuration.getCaDir());
 		jTextFieldCADir.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.setCaDir(jTextFieldCADir.getText());
+				configuration.setCaDir(jTextFieldCADir.getText());
 			}
 		});
 
-		jTextFieldVOMSDir.setText(configBean.getVOMSDir());
+		jTextFieldVOMSDir.setText(configuration.getVOMSDir());
 		jTextFieldVOMSDir.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.setVOMSDir(jTextFieldVOMSDir.getText());
+				configuration.setVOMSDir(jTextFieldVOMSDir.getText());
 			}
 		});
 
-		jTextFieldVOMSCertDir.setText(configBean.getVOMSCertDir());
+		jTextFieldVOMSCertDir.setText(configuration.getVOMSCertDir());
 		jTextFieldVOMSCertDir.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.setVOMSCertDir(jTextFieldVOMSCertDir.getText());
+		configuration.setVOMSCertDir(jTextFieldVOMSCertDir.getText());
 			}
 		});
 
-		jTextFieldProxyPath.setText(configBean.getProxyPath());
+		jTextFieldProxyPath.setText(configuration.getProxyPath());
 		jTextFieldProxyPath.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.setProxyPath(jTextFieldProxyPath.getText());
+				configuration.setProxyPath(jTextFieldProxyPath.getText());
 			}
 		});
 
-		jTextFieldDelegationID.setText(configBean.getDelegationID());
+		jTextFieldDelegationID.setText(configuration.getDelegationID());
 		jTextFieldDelegationID.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.setDelegationID(jTextFieldDelegationID.getText());
+				configuration.setDelegationID(jTextFieldDelegationID.getText());
 			}
 		});
 
-		jTextFieldProxyURL.setText(configBean.getWMProxy());
+		jTextFieldProxyURL.setText(configuration.getWMProxy());
 		jTextFieldProxyURL.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.setWMProxy(jTextFieldProxyURL.getText());
+				configuration.setWMProxy(jTextFieldProxyURL.getText());
 			}
 		});
 
-		jTextFieldWMSDir.setText(configBean.getWMSDir());
+		jTextFieldWMSDir.setText(configuration.getWMSDir());
 		jTextFieldWMSDir.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.setWMSDir(jTextFieldWMSDir.getText());
+				configuration.setWMSDir(jTextFieldWMSDir.getText());
 			}
 		});
 
-		jTextFieldOutputPath.setText(configBean.getOutputPath());
+		jTextFieldOutputPath.setText(configuration.getOutputPath());
 		jTextFieldOutputPath.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.setOutputPath(jTextFieldOutputPath.getText());
+				configuration.setOutputPath(jTextFieldOutputPath.getText());
 			}
 		});
 
-		jTextFieldPollFrequency.setText(configBean.getPollFrequency());
+		jTextFieldPollFrequency.setText(configuration.getPollFrequency());
 		jTextFieldPollFrequency.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.setPollFrequency(jTextFieldPollFrequency.getText());
+				configuration.setPollFrequency(jTextFieldPollFrequency.getText());
 			}
 		});
 
@@ -523,123 +523,123 @@ public class gLiteConfigView extends JPanel {
 
 		jLabelArguments.setText("Arguments");
 
-		jTextFieldType.setText(configBean.getJdlconfigbean().getType());
+		jTextFieldType.setText(configuration.getJdlconfigbean().getType());
 		jTextFieldType.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.getJdlconfigbean().setType(jTextFieldType.getText());
+				configuration.getJdlconfigbean().setType(jTextFieldType.getText());
 			}
 		});
 		
-		jTextFieldJobType.setText(configBean.getJdlconfigbean().getJobType());
+		jTextFieldJobType.setText(configuration.getJdlconfigbean().getJobType());
 		jTextFieldJobType.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.getJdlconfigbean().setJobType(jTextFieldJobType.getText());
+				configuration.getJdlconfigbean().setJobType(jTextFieldJobType.getText());
 			}
 		});
 
-		jTextFieldStdOut.setText(configBean.getJdlconfigbean().getStdOut());
+		jTextFieldStdOut.setText(configuration.getJdlconfigbean().getStdOut());
 		jTextFieldStdOut.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.getJdlconfigbean().setStdOut(jTextFieldStdOut.getText());
+				configuration.getJdlconfigbean().setStdOut(jTextFieldStdOut.getText());
 			}
 		});
 
-		jTextFieldStdErr.setText(configBean.getJdlconfigbean().getStdErr());
+		jTextFieldStdErr.setText(configuration.getJdlconfigbean().getStdErr());
 		jTextFieldStdErr.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.getJdlconfigbean().setStdErr(jTextFieldStdErr.getText());
+				configuration.getJdlconfigbean().setStdErr(jTextFieldStdErr.getText());
 			}
 		});
 
-		jTextFieldInputSandbox.setText(configBean.getJdlconfigbean().getInputSandbox());
+		jTextFieldInputSandbox.setText(configuration.getJdlconfigbean().getInputSandbox());
 		jTextFieldInputSandbox.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.getJdlconfigbean().setInputSandbox(jTextFieldInputSandbox.getText());
+				configuration.getJdlconfigbean().setInputSandbox(jTextFieldInputSandbox.getText());
 			}
 		});
 
-		jTextFieldOutputSandbox.setText(configBean.getJdlconfigbean().getOutputSandbox());
+		jTextFieldOutputSandbox.setText(configuration.getJdlconfigbean().getOutputSandbox());
 		jTextFieldOutputSandbox.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.getJdlconfigbean().setOutputSandbox(jTextFieldOutputSandbox.getText());
+				configuration.getJdlconfigbean().setOutputSandbox(jTextFieldOutputSandbox.getText());
 			}
 		});
 
-		jTextFieldArguments.setText(configBean.getJdlconfigbean().getArguments());
+		jTextFieldArguments.setText(configuration.getJdlconfigbean().getArguments());
 		jTextFieldArguments.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.getJdlconfigbean().setArguments(jTextFieldArguments.getText());
+				configuration.getJdlconfigbean().setArguments(jTextFieldArguments.getText());
 			}
 		});
 
-	    jTextFieldNodes.setText(configBean.getJdlconfigbean().getNodeNumber());
+	    jTextFieldNodes.setText(configuration.getJdlconfigbean().getNodeNumber());
 		jTextFieldNodes.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.getJdlconfigbean().setNodeNumber(jTextFieldNodes.getText());
+				configuration.getJdlconfigbean().setNodeNumber(jTextFieldNodes.getText());
 			}
 		});
 
-		jTextFieldRetryCount.setText(configBean.getJdlconfigbean().getRetryCount());
+		jTextFieldRetryCount.setText(configuration.getJdlconfigbean().getRetryCount());
 		jTextFieldRetryCount.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.getJdlconfigbean().setRetryCount(jTextFieldRetryCount.getText());
+				configuration.getJdlconfigbean().setRetryCount(jTextFieldRetryCount.getText());
 			}
 		});
 
-		jTextFieldInputsPath.setText(configBean.getJdlconfigbean().getInputsPath());
+		jTextFieldInputsPath.setText(configuration.getJdlconfigbean().getInputsPath());
 		jTextFieldInputsPath.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.getJdlconfigbean().setInputsPath(jTextFieldInputsPath.getText());
+				configuration.getJdlconfigbean().setInputsPath(jTextFieldInputsPath.getText());
 			}
 		});
 
-		jTextFieldExecutable.setText(configBean.getJdlconfigbean().getExecutable());
+		jTextFieldExecutable.setText(configuration.getJdlconfigbean().getExecutable());
 		jTextFieldExecutable.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.getJdlconfigbean().setExecutable(jTextFieldExecutable.getText());
+				configuration.getJdlconfigbean().setExecutable(jTextFieldExecutable.getText());
 			}
 		});
 
-		jTextFieldRequirements.setText(configBean.getJdlconfigbean().getRequirements());
+		jTextFieldRequirements.setText(configuration.getJdlconfigbean().getRequirements());
 		jTextFieldRequirements.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configBean.getJdlconfigbean().setRequirements(jTextFieldRequirements.getText());
+				configuration.getJdlconfigbean().setRequirements(jTextFieldRequirements.getText());
 			}
 		});
 		
@@ -943,7 +943,7 @@ public class gLiteConfigView extends JPanel {
 			// Dirty way to set the outputbean from outputPorts to reuse the
 			// existing code of beanshells. may be a disaster
 			//ActivityOutputPortDefinitionBean outputBean = new ActivityOutputPortDefinitionBean();
-			outputBean = new ActivityOutputPortDefinitionBean();
+//			outputBean = new ActivityOutputPortDefinitionBean();
 			outputBean.setDepth(outputBean.getDepth());
 			outputBean.setGranularDepth(outputBean.getGranularDepth());
 			List<String> mimeTypes = new ArrayList<String>();
