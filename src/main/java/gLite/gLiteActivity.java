@@ -52,7 +52,6 @@ public class gLiteActivity extends
 		addInput("datain", 0, true, handledReferenceSchemes, String.class);
 		addOutput("jobstatus", 0, 0);
 		addOutput("dataout", 0, 0);
-		
 	}
 
 	@Override

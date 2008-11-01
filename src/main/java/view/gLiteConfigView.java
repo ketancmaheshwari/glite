@@ -782,19 +782,21 @@ public class gLiteConfigView extends JPanel {
 		inputConstraint.gridx = 0;
 		for (ActivityInputPortDefinitionBean inputBean : configuration.getInputPortDefinitions()) {
 			// FIXME refactor this into a method
-			/*
-			 * ActivityInputPortDefinitionBean inputBean=new ActivityInputPortDefinitionBean();
-			 * inputBean.setName(inputPort.getName());
-			 * inputBean.setAllowsLiteralValues(true);
-			 * inputBean.setDepth(inputPort.getDepth());
-			 * inputBean.setHandledReferenceSchemes (inputPort.getHandledReferenceSchemes());
-			 * List<String> mimeTypes = new ArrayList<String>(); mimeTypes.add("text/plain");
-			 * inputBean.setMimeTypes(mimeTypes);
-			 * inputBean.setTranslatedElementType(inputPort.getClass());
+			
+			/* inputBean=new ActivityInputPortDefinitionBean();
+			 inputBean.setName(inputPort.getName());
+			 inputBean.setAllowsLiteralValues(true);
+			 inputBean.setDepth(inputPort.getDepth());
+			 inputBean.setHandledReferenceSchemes (inputPort.getHandledReferenceSchemes());
+			 List<String> mimeTypes = new ArrayList<String>(); mimeTypes.add("text/plain");
+			 inputBean.setMimeTypes(mimeTypes);
+			 inputBean.setTranslatedElementType(inputPort.getClass());
 			 */
+			
 			inputConstraint.gridy = inputGridy;
 			final gLiteInputViewer gliteInputViewer = new gLiteInputViewer(inputBean, true);
 			inputViewList.add(gliteInputViewer);
+			
 			inputConstraint.gridx = 0;
 			final JTextField nameField = gliteInputViewer.getNameField();
 			inputConstraint.weightx = 0.1;
@@ -830,6 +832,7 @@ public class gLiteConfigView extends JPanel {
 		JButton addInputPortButton = new JButton(new AbstractAction() {
 			// FIXME refactor this into a method
 			public void actionPerformed(ActionEvent e) {
+				
 				ActivityInputPortDefinitionBean bean = new ActivityInputPortDefinitionBean();
 				bean.setAllowsLiteralValues(true);
 				bean.setDepth(0);
@@ -935,18 +938,18 @@ public class gLiteConfigView extends JPanel {
 
 		outputGridy = 1;
 		outputConstraint.gridx = 0;
-		for (OutputPort outputPort : activity.getOutputPorts()) {
-			// for (ActivityOutputPortDefinitionBean outputBean :
-			// configuration.getOutputPortDefinitions()) {
+	//	for (OutputPort outputPort : activity.getOutputPorts()) {
+		for (ActivityOutputPortDefinitionBean outputBean : configuration.getOutputPortDefinitions()) {
 			// Dirty way to set the outputbean from outputPorts to reuse the
 			// existing code of beanshells. may be a disaster
-			ActivityOutputPortDefinitionBean outputBean = new ActivityOutputPortDefinitionBean();
-			outputBean.setDepth(outputPort.getDepth());
-			outputBean.setGranularDepth(outputPort.getGranularDepth());
+			//ActivityOutputPortDefinitionBean outputBean = new ActivityOutputPortDefinitionBean();
+			outputBean = new ActivityOutputPortDefinitionBean();
+			outputBean.setDepth(outputBean.getDepth());
+			outputBean.setGranularDepth(outputBean.getGranularDepth());
 			List<String> mimeTypes = new ArrayList<String>();
 			mimeTypes.add("text/plain");
 			outputBean.setMimeTypes(mimeTypes);
-			outputBean.setName(outputPort.getName());
+			//outputBean.setName(outputEditPanel.);
 			outputConstraint.gridy = outputGridy;
 			final gLiteOutputViewer gliteOutputViewer = new gLiteOutputViewer(outputBean, true);
 			outputViewList.add(gliteOutputViewer);
@@ -956,10 +959,15 @@ public class gLiteConfigView extends JPanel {
 			outputEditPanel.add(nameField, outputConstraint);
 			outputConstraint.weightx = 0;
 			outputConstraint.gridx = 1;
-
+			//outputBean.setName(nameField.getText());
+			final JSpinner depthSpinner = gliteOutputViewer.getDepthSpinner();
+			outputEditPanel.add(depthSpinner, outputConstraint);
 			outputConstraint.gridx = 2;
+			final JSpinner granularDepthSpinner = gliteOutputViewer.getGranularDepthSpinner();
+			outputEditPanel.add(granularDepthSpinner, outputConstraint);
 			outputConstraint.gridx = 3;
 			outputConstraint.gridx = 4;
+
 			final JButton removeButton = new JButton("remove");
 			removeButton.addActionListener(new AbstractAction() {
 
@@ -1100,7 +1108,7 @@ public class gLiteConfigView extends JPanel {
 				  List<ActivityOutputPortDefinitionBean> outputBeanList = new ArrayList<ActivityOutputPortDefinitionBean>();
 				  for (gLiteOutputViewer outputView : outputViewList) {
 					  ActivityOutputPortDefinitionBean activityOutputPortDefinitionBean = new ActivityOutputPortDefinitionBean();
-				  
+
 					  activityOutputPortDefinitionBean.setDepth((Integer)outputView.getDepthSpinner() .getValue());
 					  activityOutputPortDefinitionBean.setGranularDepth((Integer) outputView .getGranularDepthSpinner().getValue());
 					  activityOutputPortDefinitionBean.setName(outputView.getNameField().getText());
@@ -1111,7 +1119,7 @@ public class gLiteConfigView extends JPanel {
 				  // Edits edits = EditsRegistry.getEdits();
 				  // FIXME add all the mime types as an annotation
 				  
-				//	  outputBeanList.add(activityOutputPortDefinitionBean);
+					  outputBeanList.add(activityOutputPortDefinitionBean);
 				  }
 				 
 				gLiteActivityConfigurationBean gliteActivityConfigurationBean = new gLiteActivityConfigurationBean();
