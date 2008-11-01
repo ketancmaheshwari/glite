@@ -19,8 +19,6 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
 
 public class gLiteActivityItem extends AbstractActivityItem{
 	
-	private String WMProxy;	
-
 	public Icon getIcon() {
 		
 		return new ImageIcon(gLiteActivityItem.class.getResource("/glite.png"));
@@ -91,14 +89,6 @@ public class gLiteActivityItem extends AbstractActivityItem{
 		bean.getJdlconfigbean().setRetryCount("3");
 		bean.getJdlconfigbean().setInputsPath("/home/ketan/ManchesterWork/gliteworkflows/inputs/");
 		return bean;
-	}
-
-	public String getWMProxy() {
-		return WMProxy;
-	}
-
-	public void setWMProxy(String proxy) {
-		WMProxy = proxy;
 	}
 
 }
