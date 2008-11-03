@@ -55,7 +55,6 @@ public class gLiteConfigView extends JPanel {
 	private gLiteActivity activity;
 	/** the configuration bean used to configure the activity */
 	private gLiteActivityConfigurationBean configuration;
-//	private gLiteActivityConfigurationBean configuration;
 	
 	/**
 	 * Holds the state of the OK button in case a parent view wants to know
@@ -134,7 +133,6 @@ public class gLiteConfigView extends JPanel {
 		JTabbedPane tabbedPane = new JTabbedPane();
 		tabbedPane.addTab("Properties", setPropertiesPanel());
 		tabbedPane.addTab("Ports", setPortPanel());
-		// tabbedPane.addTab("jdl", JDLEditPanel);
 		tabbedPane.addTab("jdl", setJDLPanel());
 
 		GridBagConstraints outerConstraint = new GridBagConstraints();
@@ -202,8 +200,6 @@ public class gLiteConfigView extends JPanel {
 
 	private JPanel setPropertiesPanel() {
 		JPanel propertiesPanel = new JPanel();
-
-	//	configuration = activity.getConfiguration();
 
 		jLabelVO = new javax.swing.JLabel();
 		jLabelCADir = new javax.swing.JLabel();
@@ -943,13 +939,11 @@ public class gLiteConfigView extends JPanel {
 			// Dirty way to set the outputbean from outputPorts to reuse the
 			// existing code of beanshells. may be a disaster
 			//ActivityOutputPortDefinitionBean outputBean = new ActivityOutputPortDefinitionBean();
-//			outputBean = new ActivityOutputPortDefinitionBean();
 			outputBean.setDepth(outputBean.getDepth());
 			outputBean.setGranularDepth(outputBean.getGranularDepth());
 			List<String> mimeTypes = new ArrayList<String>();
 			mimeTypes.add("text/plain");
 			outputBean.setMimeTypes(mimeTypes);
-			//outputBean.setName(outputEditPanel.);
 			outputConstraint.gridy = outputGridy;
 			final gLiteOutputViewer gliteOutputViewer = new gLiteOutputViewer(outputBean, true);
 			outputViewList.add(gliteOutputViewer);
@@ -959,7 +953,6 @@ public class gLiteConfigView extends JPanel {
 			outputEditPanel.add(nameField, outputConstraint);
 			outputConstraint.weightx = 0;
 			outputConstraint.gridx = 1;
-			//outputBean.setName(nameField.getText());
 			final JSpinner depthSpinner = gliteOutputViewer.getDepthSpinner();
 			outputEditPanel.add(depthSpinner, outputConstraint);
 			outputConstraint.gridx = 2;
@@ -1115,9 +1108,6 @@ public class gLiteConfigView extends JPanel {
 					  activityOutputPortDefinitionBean.setMimeTypes(outputView.getMimeTypeConfig().getMimeTypeList());
 					  
 					  outputView.getMimeTypeConfig().getMimeTypeList();
-				  
-				  // Edits edits = EditsRegistry.getEdits();
-				  // FIXME add all the mime types as an annotation
 				  
 					  outputBeanList.add(activityOutputPortDefinitionBean);
 				  }
