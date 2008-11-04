@@ -82,17 +82,22 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						input = referenceService.renderIdentifier(data.get(inputName), inputPort.getTranslatedElementClass(), callback.getContext());
 						inputName = sanatisePortName(inputName);
 						wfinput.add(input.toString());
-						datanamemap.put(wfinput.get(i), getRandomString());
 						// If inputName starts with 'file' call commands to
 						// transfer it to ui
 						if (/* first part is local and second part is data */getPart(wfinput.get(i), 1).equals("local") && getPart(wfinput.get(i), 2).equals("data")) {
+							datanamemap.put(wfinput.get(i), getRandomString());
 							Runtime.getRuntime().exec("scp /home/ketan/ManchesterWork/gliteworkflows/inputs/" + getPart(wfinput.get(i),3) + " glite.unice.fr:");
+							System.out.println("scp /home/ketan/ManchesterWork/gliteworkflows/inputs/" + getPart(wfinput.get(i),3) + " glite.unice.fr:");
 							// Transfer this to grid
-							Runtime.getRuntime().exec("ssh glite.unice.fr lcg-del -a lfn:" + getPart(wfinput.get(i),3));
+							Runtime.getRuntime().exec("ssh glite.unice.fr lcg-del -a lfn:" + datanamemap.get(wfinput.get(i)));
+							System.out.println("ssh glite.unice.fr lcg-del -a lfn:" + datanamemap.get(wfinput.get(i)));
 							// upload the data on the grid with a random name
 							// using getRandomString
-							Runtime.getRuntime().exec(
-									"ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(wfinput.get(i)) + " -d prod-se-01.pd.infn.it file://`pwd`/" + getPart(wfinput.get(i),3));
+							Runtime.getRuntime().exec("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(wfinput.get(i)) + " -d prod-se-01.pd.infn.it file://`pwd`/" + getPart(wfinput.get(i),3));
+							System.out.println("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(wfinput.get(i)) + " -d prod-se-01.pd.infn.it file://`pwd`/" + getPart(wfinput.get(i),3));
+						}
+						if(/*first part lfn and second part data*/getPart(wfinput.get(i), 1).equals("lfn") && getPart(wfinput.get(i), 2).equals("data")){
+							datanamemap.put(wfinput.get(i), getRandomString());
 						}
 						i++;
 					}
@@ -103,16 +108,17 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					for (OutputPort outputPort : getOutputPorts()) {
 					//	Object value = null;
 						String name = outputPort.getName();
-						if(name.equals("jobstatus"))
-							indexofstatus=j;
 						wfoutput.add(j, name);
-						datanamemap.put(wfoutput.get(j), getRandomString());
+						if(name.equals("jobstatus")){
+							indexofstatus=j;
+						}else{
+							datanamemap.put(wfoutput.get(j), "lfn:data:"+getRandomString());	
+						}
+						
 						j++;
 					}
 					
-					
 					displayPortDetails();
-					
 					
 					configurationBean.getJdlconfigbean().setWrapper(createWrapper(configurationBean));
 					configurationBean.setJDLPath(createJDL(configurationBean));
@@ -291,7 +297,47 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		f.println("START=`date +%s`");
 		f.println("#export current path and run the executable");
 		f.println("export PATH=.:$PATH");
-		f.println("/bin/chmod 755 " + glb.getJdlconfigbean().getExecutable());
+		//f.println("/bin/chmod 755 " + glb.getJdlconfigbean().getExecutable());
+		//create the files corresponding to the outputports
+		try{
+			for (int i = 0; i < wfoutput.size(); i++) {
+				if(datanamemap.get(wfoutput.get(i))!=null)
+					f.println("touch "+getPart(datanamemap.get(wfoutput.get(i)),3));
+			}	
+		}catch (Exception e) {
+			System.err.println("exception in touch");
+			System.err.println(e.getMessage());
+			System.err.println(e.getLocalizedMessage());
+			// TODO: handle exception
+		}
+		
+		//create a string with all input and output ports separated by space
+		try{
+			String arg="";
+			for (int i = 0; i < wfinput.size(); i++) {
+				if(datanamemap.get(wfinput.get(i))!=null)
+					arg=arg+" "+datanamemap.get(wfinput.get(i));
+				else
+					arg=arg+" "+wfinput.get(i);
+			}
+			for (int i = 0; i < wfoutput.size(); i++) {
+				if(datanamemap.get(wfoutput.get(i))!=null)
+					arg=arg+" "+getPart(datanamemap.get(wfoutput.get(i)),3);
+			}
+			System.out.println("Arguments ===> "+arg);
+			
+		}catch (IllegalArgumentException iae) {
+			System.err.println("exception in creating args");
+			System.err.println(iae.getMessage());
+			
+			// TODO: handle exception
+		}catch(Exception e){
+			System.err.println("exception in creating args");
+			System.err.println(e.getLocalizedMessage());
+		}
+		
+		
+		//put executable with all ports marked with data as arguments 
 		f.println(glb.getJdlconfigbean().getExecutable() + " " + "$*");
 		f.println();
 		f.println("STOP=`date +%s`");
@@ -344,7 +390,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 	}
 
 	private static String getRandomString() {
-		Random r = new Random(System.currentTimeMillis());
+		Random r = new Random();
 		return Long.toString(Math.abs(r.nextLong()), 36).substring(0, 5);
 	}
 	
