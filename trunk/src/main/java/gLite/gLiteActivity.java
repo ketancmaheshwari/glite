@@ -46,7 +46,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		configurePorts(configurationBean);
 		List<Class<? extends ExternalReferenceSPI>> handledReferenceSchemes = new ArrayList<Class<? extends ExternalReferenceSPI>>();
 		addInput("datain", 0, true, handledReferenceSchemes, String.class);
-		addOutput("jobstatus", 0, 0);
 		addOutput("dataout", 0, 0);
 	}
 
@@ -79,8 +78,8 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 
 					for (String inputName : data.keySet()) {
 						ActivityInputPort inputPort = getInputPort(inputName);
-						input = referenceService.renderIdentifier(data.get(inputName), inputPort.getTranslatedElementClass(), callback.getContext());
 						inputName = sanatisePortName(inputName);
+						input = referenceService.renderIdentifier(data.get(inputName), inputPort.getTranslatedElementClass(), callback.getContext());
 						wfinput.add(input.toString());
 						// If inputName starts with 'file' call commands to
 						// transfer it to ui
@@ -96,30 +95,51 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							Runtime.getRuntime().exec("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(wfinput.get(i)) + " -d prod-se-01.pd.infn.it file://`pwd`/" + getPart(wfinput.get(i),3));
 							System.out.println("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(wfinput.get(i)) + " -d prod-se-01.pd.infn.it file://`pwd`/" + getPart(wfinput.get(i),3));
 						}
-						if(/*first part lfn and second part data*/getPart(wfinput.get(i), 1).equals("lfn") && getPart(wfinput.get(i), 2).equals("data")){
-							datanamemap.put(wfinput.get(i), getRandomString());
-						}
 						i++;
 					}
 					
 					int j=0;
 					wfoutput=new ArrayList<String>();
-					int indexofstatus = 0;
+					// register outputs
 					for (OutputPort outputPort : getOutputPorts()) {
-					//	Object value = null;
+						Object value = null;
 						String name = outputPort.getName();
-						wfoutput.add(j, name);
-						if(name.equals("jobstatus")){
-							indexofstatus=j;
-						}else{
-							datanamemap.put(wfoutput.get(j), "lfn:data:"+getRandomString());	
+						wfoutput.add(name);
+						datanamemap.put(wfoutput.get(j), "lfn:data:"+getRandomString());
+						value=datanamemap.get(wfoutput.get(j));
+						if (value != null) {
+							outputData.put(name, referenceService.register(value, outputPort.getDepth(), true, callback.getContext()));
+						}
+						// clear outputs
+						// TODO
+					}
+						
+					String arg="";
+					//create a string with all input and output ports separated by space
+					try{
+						for (int i1 = 0; i1 < wfinput.size(); i1++) {
+							if(datanamemap.get(wfinput.get(i1))!=null)
+								arg=arg+" "+datanamemap.get(wfinput.get(i1));
+							else
+								arg=arg+" "+getPart(wfinput.get(i1),3);
+						}
+						for (int i2 = 0; i2 < wfoutput.size(); i2++) {
+							if(datanamemap.get(wfoutput.get(i2))!=null)
+								arg=arg+" "+getPart(datanamemap.get(wfoutput.get(i2)),3);
 						}
 						
-						j++;
+					}catch (IllegalArgumentException iae) {
+						System.err.println("exception in creating args");
+						System.err.println(iae.getMessage());
+						
+						// TODO: handle exception
+					}catch(Exception e){
+						System.err.println("exception in creating args");
+						System.err.println(e.getLocalizedMessage());
 					}
-					
+
 					displayPortDetails();
-					
+					configurationBean.getJdlconfigbean().setArguments(arg);
 					configurationBean.getJdlconfigbean().setWrapper(createWrapper(configurationBean));
 					configurationBean.setJDLPath(createJDL(configurationBean));
 
@@ -194,25 +214,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						session.getJobOutput(jobId, outputDir);
 						System.out.println("Job output is downloaded to: " + outputDir);
 					}
-					
-					// register outputs
-					for (OutputPort outputPort : getOutputPorts()) {
-						Object value = null;
-						String name = outputPort.getName();
-						if (name.equals("jobstatus")){
-							value = jobState;
-							datanamemap.put(wfoutput.get(indexofstatus),value.toString());
-						}
-						
-						
-						j++;
-						if (value != null) {
-							outputData.put(name, referenceService.register(value, outputPort.getDepth(), true, callback.getContext()));
-						}
-						System.out.println("Output port's name is " + name + " and value is " + value.toString());
-						// clear outputs
-						// TODO
-					}
+
 					// send result to the callback
 					callback.receiveResult(outputData, new int[0]);
 				} catch (Exception e) {
@@ -288,6 +290,9 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 				f.println("rm -f " + getPart(wfinput.get(i),3));
 				f.println("lcg-cp --vo biomed lfn:" + getPart(wfinput.get(i),3) + " file://$(pwd)/" + getPart(wfinput.get(i),3));
 			}
+			if(getPart(wfinput.get(i),1).equals("local")&&getPart(wfinput.get(i),2).equals("data")){
+				f.println("lcg-cp --vo biomed lfn:"+datanamemap.get(wfinput.get(i))+" file://$(pwd)/"+datanamemap.get(wfinput.get(i)));
+			}
 		}
 
 		f.println("DATA_TRANSFER_FROM_GRID_END=`date +%s`");
@@ -297,7 +302,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		f.println("START=`date +%s`");
 		f.println("#export current path and run the executable");
 		f.println("export PATH=.:$PATH");
-		//f.println("/bin/chmod 755 " + glb.getJdlconfigbean().getExecutable());
+		f.println("/bin/chmod 755 " + glb.getJdlconfigbean().getExecutable());
 		//create the files corresponding to the outputports
 		try{
 			for (int i = 0; i < wfoutput.size(); i++) {
@@ -311,31 +316,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 			// TODO: handle exception
 		}
 		
-		//create a string with all input and output ports separated by space
-		try{
-			String arg="";
-			for (int i = 0; i < wfinput.size(); i++) {
-				if(datanamemap.get(wfinput.get(i))!=null)
-					arg=arg+" "+datanamemap.get(wfinput.get(i));
-				else
-					arg=arg+" "+wfinput.get(i);
-			}
-			for (int i = 0; i < wfoutput.size(); i++) {
-				if(datanamemap.get(wfoutput.get(i))!=null)
-					arg=arg+" "+getPart(datanamemap.get(wfoutput.get(i)),3);
-			}
-			System.out.println("Arguments ===> "+arg);
-			
-		}catch (IllegalArgumentException iae) {
-			System.err.println("exception in creating args");
-			System.err.println(iae.getMessage());
-			
-			// TODO: handle exception
-		}catch(Exception e){
-			System.err.println("exception in creating args");
-			System.err.println(e.getLocalizedMessage());
-		}
-		
 		
 		//put executable with all ports marked with data as arguments 
 		f.println(glb.getJdlconfigbean().getExecutable() + " " + "$*");
@@ -345,7 +325,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		f.println("echo \"Total running time: $TOTAL seconds\"");
 		f.println("DATA_TRANSFER_TO_GRID_START=`date +%s`");
 		
-		f.println("Treating input ports ..");
+		f.println("#Treating input ports ..");
 		for (int i = 0; i < wfinput.size(); i++) {
 			if(getPart(wfinput.get(i), 1).equals("lfn")){
 				f.println("lcg-del --vo biomed -a lfn:" + getPart(wfinput.get(i),3));
@@ -355,9 +335,9 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 			}
 		}
 		
-		f.println("Treating output ports ...");
+		f.println("#Treating output ports ...");
 		for (int i = 0; i < wfoutput.size(); i++) {
-			f.println(wfoutput.get(i));
+			f.println("lcg-cr --vo biomed -l lfn:" + getPart(datanamemap.get(wfoutput.get(i)),3) + " -d prod-se-01.pd.infn.it file://$(pwd)/"+getPart(datanamemap.get(wfoutput.get(i)),3));
 		}
 
 		f.println("DATA_TRANSFER_TO_GRID_END=`date +%s`");
@@ -367,9 +347,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		f.println("TOTAL_DATA_TRANSFER_TIME=`expr $TIME_TAKEN_FOR_DATA_TRANSFER_FROM_GRID + $TIME_TAKEN_FOR_DATA_TRANSFER_TO_GRID`");
 
 		f.println("echo \"Total data transfer time: $TOTAL_DATA_TRANSFER_TIME seconds. \"");
-		f.println("#Create the file outdata.txt");
-		f.println("touch outdata.txt");
-		// copy the outputdata link to this file
 		f.println();
 		f.close();
 		return wrapperfile.getName();
