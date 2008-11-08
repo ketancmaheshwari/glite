@@ -244,24 +244,34 @@ public class gLiteConfigView extends JPanel {
 		jLabelPollFrequency.setText("Poll Frequency");
 
 		jTextFieldWMSDir.setColumns(30);
+        jTextFieldWMSDir.setToolTipText("");
 
 		jTextFieldVO.setColumns(30);
+        jTextFieldVO.setToolTipText("Name of the VO");
 
 		jTextFieldCADir.setColumns(30);
+        jTextFieldCADir.setToolTipText("");
 
 		jTextFieldVOMSDir.setColumns(30);
+        jTextFieldVOMSDir.setToolTipText("");
 
 		jTextFieldVOMSCertDir.setColumns(30);
+        jTextFieldVOMSCertDir.setToolTipText("Path of VOMS certifates installation");
 
 		jTextFieldProxyPath.setColumns(30);
+        jTextFieldProxyPath.setToolTipText("Path of the proxy certificate");
 
 		jTextFieldDelegationID.setColumns(30);
+        jTextFieldDelegationID.setToolTipText("Can be any number");
 
 		jTextFieldProxyURL.setColumns(30);
+        jTextFieldProxyURL.setToolTipText("WMProxy endpoint URL");
 
 		jTextFieldOutputPath.setColumns(30);
+        jTextFieldOutputPath.setToolTipText("Path where you want your output to be written (usually /tmp)");
 
 		jTextFieldPollFrequency.setColumns(30);
+        jTextFieldPollFrequency.setToolTipText("Milliseconds you want to poll for the job status (20000(20sec) is a good time!)");
 
 		GroupLayout layout = new GroupLayout(propertiesPanel);
 		propertiesPanel.setLayout(layout);
@@ -485,35 +495,48 @@ public class gLiteConfigView extends JPanel {
 
 		jLabelInputSandbox.setText("InputSandbox");
 
+
 		jTextFieldInputSandbox.setColumns(25);
+        jTextFieldInputSandbox.setToolTipText("Name of inputsandbox files:commaseparated and with double quotes");
 
 		jTextFieldType.setColumns(25);
+        jTextFieldType.setToolTipText("always job");
 
 		jTextFieldJobType.setColumns(25);
+        jTextFieldJobType.setToolTipText("Normal or MPICH");
 
 		jTextFieldNodes.setColumns(25);
+        jTextFieldNodes.setToolTipText(">0 in case of MPICH jobs");
 
 		jTextFieldStdOut.setColumns(25);
+        jTextFieldStdOut.setToolTipText("Name of the standard output file in double quotes");
 
 		jTextFieldStdErr.setColumns(25);
+        jTextFieldStdErr.setToolTipText("Name of standard error file in double quotes");
 
 		jTextFieldOutputSandbox.setColumns(25);
+        jTextFieldOutputSandbox.setToolTipText("Name of outputsandbox files:commaseparated and with double quotes");
 
 		jLabelExecutable.setText("Executable");
 
 		jTextFieldExecutable.setColumns(25);
+        jTextFieldExecutable.setToolTipText("Name of the executable");
 
 		jLabelRequirements.setText("Job Requirements");
 
 		jTextFieldRequirements.setColumns(25);
+        jTextFieldRequirements.setToolTipText("job requirements");
 
 		jLabelRetryCount.setText("Retry Count");
 
 		jTextFieldRetryCount.setColumns(25);
+        jTextFieldRetryCount.setToolTipText("Retry Count");
 
 		jLabelInputsPath.setText("Inputs Path");
 
 		jTextFieldInputsPath.setColumns(25);
+        jTextFieldInputsPath.setToolTipText("Complete path where all the files(sandbox, executable etc.) are to be found");
+
 
 		jTextFieldArguments.setColumns(25);
 
