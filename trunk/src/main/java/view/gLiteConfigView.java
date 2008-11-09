@@ -509,10 +509,10 @@ public class gLiteConfigView extends JPanel {
         jTextFieldNodes.setToolTipText(">0 in case of MPICH jobs");
 
 		jTextFieldStdOut.setColumns(25);
-        jTextFieldStdOut.setToolTipText("Name of the standard output file in double quotes");
+        jTextFieldStdOut.setToolTipText("Name of the standard output file");
 
 		jTextFieldStdErr.setColumns(25);
-        jTextFieldStdErr.setToolTipText("Name of standard error file in double quotes");
+        jTextFieldStdErr.setToolTipText("Name of standard error file");
 
 		jTextFieldOutputSandbox.setColumns(25);
         jTextFieldOutputSandbox.setToolTipText("Name of outputsandbox files:commaseparated and with double quotes");
@@ -990,6 +990,8 @@ public class gLiteConfigView extends JPanel {
 				public void actionPerformed(ActionEvent e) {
 					outputViewList.remove(gliteOutputViewer);
 					outputEditPanel.remove(nameField);
+					outputEditPanel.remove(depthSpinner);
+					outputEditPanel.remove(granularDepthSpinner);
 					outputEditPanel.remove(removeButton);
 					outputEditPanel.revalidate();
 					outerOutputPanel.revalidate();
