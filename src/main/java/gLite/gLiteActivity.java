@@ -38,7 +38,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 	private String outputDir;
 	private static ArrayList<String> wfinput;
 	private static ArrayList<String> wfoutput;
-	private static ArrayList<String> mark4download;
 	private static HashMap<String, String> datanamemap = new HashMap<String, String>();
 
 	@Override
@@ -101,7 +100,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					
 					int j=0;
 					wfoutput=new ArrayList<String>();
-					mark4download=new ArrayList<String>();
 					// register outputs
 					for (OutputPort outputPort : getOutputPorts()) {
 						Object value = null;
@@ -111,9 +109,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						value=datanamemap.get(wfoutput.get(j));
 						if (value != null) {
 							outputData.put(name, referenceService.register(value, outputPort.getDepth(), true, callback.getContext()));
-						}
-						if (name.substring(0, 5).equalsIgnoreCase("local")){
-							mark4download.add(getPart(value.toString(), 3));
 						}
 						// clear outputs
 						// TODO
@@ -220,10 +215,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						System.out.println("Job output is downloaded to: " + outputDir);
 					}
 					
-					for (int k = 0; k < mark4download.size(); k++) {
-						Runtime.getRuntime().exec("ssh glite.unice.fr lcg-cp --vo biomed lfn:" + mark4download.get(k) + " file://`pwd`/" + mark4download.get(k));
-						Runtime.getRuntime().exec("ssh glite.unice.fr scp " + mark4download.get(k) + " gridou.polytech.unice.fr:~");
-					}
 					// send result to the callback
 					callback.receiveResult(outputData, new int[0]);
 				} catch (Exception e) {
