@@ -38,6 +38,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 	private String outputDir;
 	private static ArrayList<String> wfinput;
 	private static ArrayList<String> wfoutput;
+	private static ArrayList<String> mark4download;
 	private static HashMap<String, String> datanamemap = new HashMap<String, String>();
 
 	@Override
@@ -100,6 +101,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					
 					int j=0;
 					wfoutput=new ArrayList<String>();
+					mark4download=new ArrayList<String>();
 					// register outputs
 					for (OutputPort outputPort : getOutputPorts()) {
 						Object value = null;
@@ -109,6 +111,9 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						value=datanamemap.get(wfoutput.get(j));
 						if (value != null) {
 							outputData.put(name, referenceService.register(value, outputPort.getDepth(), true, callback.getContext()));
+						}
+						if (name.substring(0, 5).equalsIgnoreCase("local")){
+							mark4download.add(getPart(value.toString(), 3));
 						}
 						// clear outputs
 						// TODO
@@ -214,7 +219,11 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						session.getJobOutput(jobId, outputDir);
 						System.out.println("Job output is downloaded to: " + outputDir);
 					}
-
+					
+					for (int k = 0; k < mark4download.size(); k++) {
+						Runtime.getRuntime().exec("ssh glite.unice.fr lcg-cp --vo biomed lfn:" + mark4download.get(k) + " file://`pwd`/" + mark4download.get(k));
+						Runtime.getRuntime().exec("ssh glite.unice.fr scp " + mark4download.get(k) + " gridou.polytech.unice.fr:~");
+					}
 					// send result to the callback
 					callback.receiveResult(outputData, new int[0]);
 				} catch (Exception e) {
@@ -262,7 +271,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		f.println("Stdoutput=\"" + glb.getJdlconfigbean().getStdOut() + "\";");
 		f.println("StdError=\"" + glb.getJdlconfigbean().getStdErr() + "\";");
 		f.println("InputSandbox={" + glb.getJdlconfigbean().getInputSandbox() + ",\"" + glb.getJdlconfigbean().getWrapper() + "\"};");
-		f.println("OutputSandbox={" + glb.getJdlconfigbean().getOutputSandbox() + ",\"outdata.txt\"};");
+		f.println("OutputSandbox={" + glb.getJdlconfigbean().getOutputSandbox() + "};");
 		f.println("RetryCount=" + glb.getJdlconfigbean().getRetryCount() + ";");
 		f.println("Requirements=" + glb.getJdlconfigbean().getRequirements() + ";");
 		f.println("Rank=(-other.GlueCEStateEstimatedResponseTime);");
@@ -278,6 +287,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		File wrapperfile = new File(glb.getJdlconfigbean().getInputsPath(), "wrapper_" + System.currentTimeMillis() + ".sh");
 		PrintWriter f = new PrintWriter(new FileWriter(wrapperfile));
 		f.println("#!/bin/sh");
+		f.println("/bin/sleep 10");
 		f.println("export LFC_HOME=lfc-biomed.in2p3.fr:/grid/biomed/testKetan");
 		f.println();
 		f.println("#Read the starting time");
@@ -287,7 +297,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 
 		for (int i = 0; i < wfinput.size(); i++) {
 			if(getPart(wfinput.get(i), 1).equals("lfn")){
-				f.println("rm -f " + getPart(wfinput.get(i),3));
+				f.println("#rm -f " + getPart(wfinput.get(i),3));
 				f.println("lcg-cp --vo biomed lfn:" + getPart(wfinput.get(i),3) + " file://$(pwd)/" + getPart(wfinput.get(i),3));
 			}
 			if(getPart(wfinput.get(i),1).equals("local")&&getPart(wfinput.get(i),2).equals("data")){
@@ -307,7 +317,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		try{
 			for (int i = 0; i < wfoutput.size(); i++) {
 				if(datanamemap.get(wfoutput.get(i))!=null)
-					f.println("touch "+getPart(datanamemap.get(wfoutput.get(i)),3));
+					f.println("#touch "+getPart(datanamemap.get(wfoutput.get(i)),3));
 			}	
 		}catch (Exception e) {
 			System.err.println("exception in touch");
@@ -328,7 +338,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		f.println("#Treating input ports ..");
 		for (int i = 0; i < wfinput.size(); i++) {
 			if(getPart(wfinput.get(i), 1).equals("lfn")){
-				f.println("lcg-del --vo biomed -a lfn:" + getPart(wfinput.get(i),3));
+				f.println("#lcg-del --vo biomed -a lfn:" + getPart(wfinput.get(i),3));
 				// introduce a delay for updation of the lcg catalogue
 				f.println("/bin/sleep 3");
 				f.println("lcg-cr --vo biomed -l lfn:" + getPart(wfinput.get(i),3) + " -d prod-se-01.pd.infn.it file://$(pwd)/" + getPart(wfinput.get(i),3));				
@@ -346,7 +356,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 
 		f.println("TOTAL_DATA_TRANSFER_TIME=`expr $TIME_TAKEN_FOR_DATA_TRANSFER_FROM_GRID + $TIME_TAKEN_FOR_DATA_TRANSFER_TO_GRID`");
 
-		f.println("echo \"Total data transfer time: $TOTAL_DATA_TRANSFER_TIME seconds. \"");
+		f.println("echo \"Total data transfer time: $TOTAL_DATA_TRANSFER_TIME seconds.\"");
 		f.println();
 		f.close();
 		return wrapperfile.getName();
