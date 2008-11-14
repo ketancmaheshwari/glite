@@ -39,6 +39,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 	private static ArrayList<String> wfinput;
 	private static ArrayList<String> wfoutput;
 	private static HashMap<String, String> datanamemap = new HashMap<String, String>();
+	private static String innerarg;
 
 	@Override
 	public void configure(gLiteActivityConfigurationBean configurationBean) throws ActivityConfigurationException {
@@ -105,30 +106,31 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						Object value = null;
 						String name = outputPort.getName();
 						wfoutput.add(name);
-						datanamemap.put(wfoutput.get(j), "lfn:data:"+getRandomString());
+						datanamemap.put(wfoutput.get(j), "lfn:"+getRandomString());
 						value=datanamemap.get(wfoutput.get(j));
 						if (value != null) {
 							outputData.put(name, referenceService.register(value, outputPort.getDepth(), true, callback.getContext()));
 						}
 						// clear outputs
 						// TODO
+						j++;
 					}
 						
-					String arg=new String();
+					String wrapperarg=new String();
 					//create a string with all input and output ports separated by space
 					try{
 						for (int i1 = 0; i1 < wfinput.size(); i1++) {
 							if(datanamemap.get(wfinput.get(i1))!=null)
-								arg=arg+" "+datanamemap.get(wfinput.get(i1));
+								wrapperarg=wrapperarg+" "+datanamemap.get(wfinput.get(i1));
 							else if(getPart(wfinput.get(i1),2)!=null)
-								arg=arg+" "+getPart(wfinput.get(i1),2);
+								wrapperarg=wrapperarg+" "+getPart(wfinput.get(i1),2);
 							else{
 								
 							}
 						}
 						for (int i2 = 0; i2 < wfoutput.size(); i2++) {
 							if(datanamemap.get(wfoutput.get(i2))!=null)
-								arg=arg+" "+getPart(datanamemap.get(wfoutput.get(i2)),2);
+								wrapperarg=wrapperarg+" "+getPart(datanamemap.get(wfoutput.get(i2)),2);
 						}
 						
 					}catch (IllegalArgumentException iae) {
@@ -142,8 +144,9 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					}
 
 					displayPortDetails();
-					if(configurationBean.getJdlconfigbean().getArguments().trim().equals(""))
-						configurationBean.getJdlconfigbean().setArguments(arg);
+					innerarg=new String();
+					innerarg=configurationBean.getJdlconfigbean().getArguments();
+					configurationBean.getJdlconfigbean().setArguments(wrapperarg);
 					configurationBean.getJdlconfigbean().setWrapper(createWrapper(configurationBean));
 					configurationBean.setJDLPath(createJDL(configurationBean));
 
@@ -327,7 +330,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		}	
 		
 		//put executable with all ports marked with data as arguments 
-		f.println(glb.getJdlconfigbean().getExecutable() + " " + "$*");
+		f.println(glb.getJdlconfigbean().getExecutable() + " " + innerarg);
 		f.println();
 		f.println("STOP=`date +%s`");
 		f.println("TOTAL=`expr $STOP - $START`");
