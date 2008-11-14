@@ -114,14 +114,17 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						// TODO
 					}
 						
-					String arg="";
+					String arg=new String();
 					//create a string with all input and output ports separated by space
 					try{
 						for (int i1 = 0; i1 < wfinput.size(); i1++) {
 							if(datanamemap.get(wfinput.get(i1))!=null)
 								arg=arg+" "+datanamemap.get(wfinput.get(i1));
-							else
+							else if(getPart(wfinput.get(i1),2)!=null)
 								arg=arg+" "+getPart(wfinput.get(i1),2);
+							else{
+								
+							}
 						}
 						for (int i2 = 0; i2 < wfoutput.size(); i2++) {
 							if(datanamemap.get(wfoutput.get(i2))!=null)
@@ -139,7 +142,8 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					}
 
 					displayPortDetails();
-					configurationBean.getJdlconfigbean().setArguments(arg);
+					if(configurationBean.getJdlconfigbean().getArguments().trim().equals(""))
+						configurationBean.getJdlconfigbean().setArguments(arg);
 					configurationBean.getJdlconfigbean().setWrapper(createWrapper(configurationBean));
 					configurationBean.setJDLPath(createJDL(configurationBean));
 
@@ -279,6 +283,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		PrintWriter f = new PrintWriter(new FileWriter(wrapperfile));
 		f.println("#!/bin/sh");
 		f.println("/bin/sleep 10");
+		f.println("echo $*");
 		f.println("export LFC_HOME=lfc-biomed.in2p3.fr:/grid/biomed/testKetan");
 		f.println();
 		f.println("#Read the starting time");
@@ -290,9 +295,13 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 			if(getPart(wfinput.get(i), 1).equals("lfn")){
 				f.println("#rm -f " + getPart(wfinput.get(i),2));
 				f.println("lcg-cp --vo biomed lfn:" + getPart(wfinput.get(i),2) + " file://$(pwd)/" + getPart(wfinput.get(i),2));
+				f.println("if [ $? -ne 0 ]; then  lcg-cp --vo biomed lfn:" + getPart(wfinput.get(i),2) + " file://$(pwd)/" + getPart(wfinput.get(i),2));
+				f.println("fi");
 			}
 			if(getPart(wfinput.get(i),1).equals("file")){
 				f.println("lcg-cp --vo biomed lfn:"+datanamemap.get(wfinput.get(i))+" file://$(pwd)/"+datanamemap.get(wfinput.get(i)));
+				f.println("if [ $? -ne 0 ]; then lcg-cp --vo biomed lfn:"+datanamemap.get(wfinput.get(i))+" file://$(pwd)/"+datanamemap.get(wfinput.get(i)));
+				f.println("fi");
 			}
 		}
 
@@ -315,8 +324,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 			System.err.println(e.getMessage());
 			System.err.println(e.getLocalizedMessage());
 			// TODO: handle exception
-		}
-		
+		}	
 		
 		//put executable with all ports marked with data as arguments 
 		f.println(glb.getJdlconfigbean().getExecutable() + " " + "$*");
@@ -338,6 +346,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		
 		f.println("#Treating output ports ...");
 		for (int i = 0; i < wfoutput.size(); i++) {
+			f.println("#"+getPart(datanamemap.get(wfoutput.get(i)),1)+" "+getPart(datanamemap.get(wfoutput.get(i)),2));
 			f.println("lcg-cr --vo biomed -l lfn:" + getPart(datanamemap.get(wfoutput.get(i)),2) + " -d prod-se-01.pd.infn.it file://$(pwd)/"+getPart(datanamemap.get(wfoutput.get(i)),2));
 		}
 

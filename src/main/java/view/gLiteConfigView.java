@@ -12,10 +12,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,12 +27,8 @@ import javax.swing.JSpinner;
 import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 
-import org.embl.ebi.escience.scufl.InputPort;
 
 import net.sf.taverna.t2.reference.ExternalReferenceSPI;
-import net.sf.taverna.t2.workflowmodel.OutputPort;
-import net.sf.taverna.t2.workflowmodel.processor.activity.Activity;
-import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean;
 import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean;
 
@@ -51,8 +43,6 @@ public class gLiteConfigView extends JPanel {
 	private List<gLiteInputViewer> inputViewList;
 	/** A List of views over the output ports */
 	private List<gLiteOutputViewer> outputViewList;
-	/** The activity which this view describes */
-	private gLiteActivity activity;
 	/** the configuration bean used to configure the activity */
 	private gLiteActivityConfigurationBean configuration;
 	
@@ -92,7 +82,6 @@ public class gLiteConfigView extends JPanel {
 	 *            the {@link gLiteActivity} that the view is over
 	 */
 	public gLiteConfigView(gLiteActivity activity) {
-		this.activity = activity;
 		configuration = activity.getConfiguration();
 		setLayout(new GridBagLayout());
 		initialise();
@@ -244,16 +233,16 @@ public class gLiteConfigView extends JPanel {
 		jLabelPollFrequency.setText("Poll Frequency");
 
 		jTextFieldWMSDir.setColumns(30);
-        jTextFieldWMSDir.setToolTipText("");
+        jTextFieldWMSDir.setToolTipText("Points to a simple text file containing the server URLs for your VO");
 
 		jTextFieldVO.setColumns(30);
         jTextFieldVO.setToolTipText("Name of the VO");
 
 		jTextFieldCADir.setColumns(30);
-        jTextFieldCADir.setToolTipText("");
+        jTextFieldCADir.setToolTipText("Should point to the location where CA certificates are installed, usually /etc/grid-security/certificates");
 
 		jTextFieldVOMSDir.setColumns(30);
-        jTextFieldVOMSDir.setToolTipText("");
+        jTextFieldVOMSDir.setToolTipText("Points to a simple text file with the location of VOMS server");
 
 		jTextFieldVOMSCertDir.setColumns(30);
         jTextFieldVOMSCertDir.setToolTipText("Path of VOMS certifates installation");
