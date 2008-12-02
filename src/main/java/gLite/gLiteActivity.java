@@ -6,11 +6,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import jlite.GridSession;
@@ -39,7 +41,8 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 	private gLiteActivityConfigurationBean configurationBean;
 	private String outputDir;
 	private static String grid_storage_element;
-	private static ArrayList<String> wfinput;
+	//private static ArrayList<String> wfinput;
+	private static TreeMap<String, String> wfinput;
 	private static ArrayList<String> wfoutput;
 	private static HashMap<String, String> datanamemap = new HashMap<String, String>();
 	private static String innerarg;
@@ -49,10 +52,14 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		//grid_storage_element="prod-se-01.pd.infn.it";
 		//grid_storage_element="lxfs07.jinr.ru";
 		//grid_storage_element="marsedpm.in2p3.fr";
-//		grid_storage_element="polgrid4.in2p3.fr";
+		//grid_storage_element="polgrid4.in2p3.fr";
 		//grid_storage_element="srm.glite.ecdf.ed.ac.uk";
 		//grid_storage_element="tbn18.nikhef.nl";
-		grid_storage_element="grid-se.lns.infn.it";
+		//grid_storage_element="grid-se.lns.infn.it";
+		//grid_storage_element="se01.dur.scotgrid.ac.uk";
+		grid_storage_element="hepgrid11.ph.liv.ac.uk";
+		//grid_storage_element="cirigridse01.univ-bpclermont.fr";
+		
 		this.configurationBean = configurationBean;
 		configurePorts(configurationBean);
 		List<Class<? extends ExternalReferenceSPI>> handledReferenceSchemes = new ArrayList<Class<? extends ExternalReferenceSPI>>();
@@ -84,19 +91,23 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 				Map<String, T2Reference> outputData = new HashMap<String, T2Reference>();
 				try {
 					// set inputs
-					wfinput = new ArrayList<String>();
+					//wfinput = new ArrayList<String>();
+					wfinput = new TreeMap<String,String>();
 					String nextinput;
 					for (String inputName : data.keySet()) {		
 						ActivityInputPort inputPort = getInputPort(inputName);
 						inputName = sanatisePortName(inputName);
 						input = referenceService.renderIdentifier(data.get(inputName), inputPort.getTranslatedElementClass(), callback.getContext());
-						wfinput.add(input.toString());
+						//wfinput.add(input.toString());
+						wfinput.put(inputName,input.toString());
 					}
 					
 					//sort the input ports first
-					Collections.sort(wfinput);
+				//	Collections.sort(wfinput);
+					Collection<String> inputportvalues=wfinput.values();
 					
-					for (Iterator<String> iterator = wfinput.iterator(); iterator.hasNext();) {
+					for (Iterator<String> iterator = inputportvalues.iterator(); iterator.hasNext();) {
+				//	for (Iterator<String> iterator = wfinput.keyIterator(); iterator.hasNext();) {
 					// If inputName starts with 'file' transfer it to ui
 						nextinput=(String)iterator.next();
 						if (/* first part is file*/getPart(nextinput, 1).equals("file")) {
@@ -133,10 +144,9 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					
 					//create a string with all input and output ports separated by space
 					try{
-						for (Iterator<String> iterator = wfinput.iterator(); iterator.hasNext();) {
+					//	for (Iterator<String> iterator = wfinput.keyIterator(); iterator.hasNext();) {
+						for (Iterator<String> iterator = inputportvalues.iterator(); iterator.hasNext();) {
 							nextinput=(String)iterator.next();
-							
-							
 							if(getPart(nextinput, 1).equals("lfn")){
 								System.out.println("wfinput is lfn "+nextinput);
 								wrapperarg=wrapperarg+" "+getPart(nextinput,2);
@@ -314,7 +324,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		File wrapperfile = new File(glb.getJdlconfigbean().getInputsPath(), "wrapper_" + System.currentTimeMillis() + ".sh");
 		PrintWriter f = new PrintWriter(new FileWriter(wrapperfile));
 		f.println("#!/bin/bash");
-		f.println("/bin/sleep 10");
+	//	f.println("/bin/sleep 10");
 		f.println("echo $*");
 		f.println("export LFC_HOME=lfc-biomed.in2p3.fr:/grid/biomed/testKetan");
 		f.println();
@@ -322,18 +332,20 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		f.println("DATA_TRANSFER_FROM_GRID_START=`date +%s`");
 		f.println();
 		f.println("#copy data to Workernode");
-
-		for (int i = 0; i < wfinput.size(); i++) {
-			if(getPart(wfinput.get(i), 1).equals("lfn")){
-				f.println("#rm -f " + getPart(wfinput.get(i),2));
-				f.println("lcg-cp --vo biomed lfn:" + getPart(wfinput.get(i),2) + " file://$(pwd)/" + getPart(wfinput.get(i),2));
-				f.println("if [ $? -ne 0 ]; then  lcg-cp --vo biomed lfn:" + getPart(wfinput.get(i),2) + " file://$(pwd)/" + getPart(wfinput.get(i),2));
-				f.println("fi");
+		
+		Collection<String> inputvalues=wfinput.values();
+		String nextinput;
+		//for (int i = 0; i < wfinput.size(); i++) {
+		for (Iterator<String> iterator = inputvalues.iterator(); iterator.hasNext();) {
+			nextinput=(String)iterator.next();
+			if(getPart(nextinput, 1).equals("lfn")){
+				f.println("#rm -f " + getPart(nextinput,2));
+				f.println("lcg-cp --vo biomed lfn:" + getPart(nextinput,2) + " file://$(pwd)/" + getPart(nextinput,2));
+				f.println("/bin/sleep/ 7");
 			}
-			if(getPart(wfinput.get(i),1).equals("file")){
-				f.println("lcg-cp --vo biomed lfn:"+datanamemap.get(wfinput.get(i))+" file://$(pwd)/"+datanamemap.get(wfinput.get(i)));
-				f.println("if [ $? -ne 0 ]; then lcg-cp --vo biomed lfn:"+datanamemap.get(wfinput.get(i))+" file://$(pwd)/"+datanamemap.get(wfinput.get(i)));
-				f.println("fi");
+			if(getPart(nextinput,1).equals("file")){
+				f.println("lcg-cp --vo biomed lfn:"+datanamemap.get(nextinput)+" file://$(pwd)/"+datanamemap.get(nextinput));
+				f.println("/bin/sleep/ 10");
 			}
 		}
 
@@ -367,13 +379,16 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		f.println("DATA_TRANSFER_TO_GRID_START=`date +%s`");
 		
 		f.println("#Treating input ports ..");
-		for (int i = 0; i < wfinput.size(); i++) {
-			if(getPart(wfinput.get(i), 1).equals("lfn")){
-				f.println("#lcg-del --vo biomed -a lfn:" + getPart(wfinput.get(i),2));
+		
+		//for (int i = 0; i < wfinput.size(); i++) {
+		for (Iterator<String> iterator = inputvalues.iterator(); iterator.hasNext();) {
+			nextinput=(String)iterator.next();
+			if(getPart(nextinput, 1).equals("lfn")){
+				f.println("#lcg-del --vo biomed -a lfn:" + getPart(nextinput,2));
 				// introduce a delay for updation of the lcg catalogue
-				f.println("/bin/sleep 3");
-				f.println("lcg-cr --vo biomed -l lfn:" + getPart(wfinput.get(i),2) + " -d "+grid_storage_element+" file://$(pwd)/" + getPart(wfinput.get(i),2));
-				f.println("lcg-cr --vo biomed -l lfn:" + getPart(wfinput.get(i),2) + " -d "+grid_storage_element+" file://$(pwd)/" + getPart(wfinput.get(i),2));
+				f.println("lcg-cr --vo biomed -l lfn:" + getPart(nextinput,2) + " -d "+grid_storage_element+" file://$(pwd)/" + getPart(nextinput,2));
+				f.println("/bin/sleep/ 7");
+				f.println("lcg-cr --vo biomed -l lfn:" + getPart(nextinput,2) + " -d "+grid_storage_element+" file://$(pwd)/" + getPart(nextinput,2));
 			}
 		}
 		
@@ -381,6 +396,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		for (int i = 0; i < wfoutput.size(); i++) {
 			f.println("#"+getPart(datanamemap.get(wfoutput.get(i)),1)+" "+getPart(datanamemap.get(wfoutput.get(i)),2));
 			f.println("lcg-cr --vo biomed -l lfn:" + getPart(datanamemap.get(wfoutput.get(i)),2) + " -d "+grid_storage_element+" file://$(pwd)/"+getPart(datanamemap.get(wfoutput.get(i)),2));
+			f.println("/bin/sleep/ 7");
 		}
 
 		f.println("DATA_TRANSFER_TO_GRID_END=`date +%s`");
@@ -415,12 +431,12 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 	}
 	
 	private static void displayPortDetails(){
-		for (int i = 0; i < wfinput.size(); i++) {
+		/*for (int i = 0; i < wfinput.size(); i++) {
 			System.out.println(wfinput.get(i)+" ==> "+datanamemap.get(wfinput.get(i)));
-		}
+		}*/
 		
 		for (int i = 0; i < wfoutput.size(); i++) {
-			System.out.println(wfoutput.get(i)+" ==> "+datanamemap.get(wfoutput.get(i)));
+			System.out.println("Output port "+ wfoutput.get(i)+" ==> "+datanamemap.get(wfoutput.get(i)));
 		}
 	}
 }
