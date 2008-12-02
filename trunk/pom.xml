@@ -151,11 +151,18 @@
    <version>1</version>
    </dependency>
 
-   <dependency>
-   <groupId>glite</groupId>
-   <artifactId>lb_1.5.3</artifactId>
-   <version>1</version>
-   </dependency>
+<!--   <dependency>-->
+<!--   <groupId>glite</groupId>-->
+<!--   <artifactId>lb_1.5.3</artifactId>-->
+<!--   <version>1</version>-->
+<!--   </dependency>-->
+ 
+ <dependency>
+ <groupId>glite</groupId>
+ <artifactId>lb</artifactId>
+ <version>1</version>
+ </dependency> 
+  
   
    <dependency>
    <groupId>glite</groupId>

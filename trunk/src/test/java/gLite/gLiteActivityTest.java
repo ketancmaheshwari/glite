@@ -54,8 +54,8 @@ public class gLiteActivityTest {
 		configurationBean.setOutputPortDefinitions(Collections.singletonList(outputPortBean));
 		
 		
-		//configurationBean.setWMProxy("https://egee-wms-01.cnaf.infn.it:7443/glite_wms_wmproxy_server");
-		configurationBean.setWMProxy("https://wms01.egee-see.org:7443/glite_wms_wmproxy_server");
+		configurationBean.setWMProxy("https://egee-wms-01.cnaf.infn.it:7443/glite_wms_wmproxy_server");
+		//configurationBean.setWMProxy("https://wms01.egee-see.org:7443/glite_wms_wmproxy_server");
 		configurationBean.setDelegationID("501");
 		configurationBean.setCaDir("/etc/grid-security/certificates");
 		configurationBean.setProxyPath("/tmp/x509up_u501");
