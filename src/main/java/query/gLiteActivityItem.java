@@ -76,6 +76,7 @@ public class gLiteActivityItem extends AbstractActivityItem{
 		bean.setJDLPath("/home/ketan/jlite/test/test.jdl");
 		bean.setOutputPath("/tmp/");
 		bean.setPollFrequency("20000");
+		bean.setSE("hepgrid11.ph.liv.ac.uk");
 		bean.getJdlconfigbean().setType("Job");
 		bean.getJdlconfigbean().setJobType("Normal");
 		bean.getJdlconfigbean().setNodeNumber("0");
@@ -84,7 +85,7 @@ public class gLiteActivityItem extends AbstractActivityItem{
 		bean.getJdlconfigbean().setInputSandbox("\"blah.txt\"");
 		bean.getJdlconfigbean().setOutputSandbox("\"stdout\",\"stderr\"");
 		bean.getJdlconfigbean().setExecutable("/bin/echo");
-		bean.getJdlconfigbean().setArguments("Salut");
+		bean.getJdlconfigbean().setJDLArguments("$*");
 		bean.getJdlconfigbean().setRequirements("(other.GlueCEStateStatus == \"Production\") && RegExp(\"nl\",other.GlueCEUniqueId)");
 		bean.getJdlconfigbean().setRetryCount("3");
 		bean.getJdlconfigbean().setInputsPath("/home/ketan/ManchesterWork/gliteworkflows/inputs/");

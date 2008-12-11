@@ -65,11 +65,12 @@ public class gLiteActivityTest {
 		configurationBean.setWMSDir("/home/ketan/glite-ui/glite/etc/wms/biomed");
 		//configurationBean.setJDLPath("/home/ketan/jlite/test/test.jdl");
 		configurationBean.setPollFrequency("10000");
+		configurationBean.setSE("hepgrid11.ph.liv.ac.uk");
 		
 		configurationBean.getJdlconfigbean().setType("Job");
 		configurationBean.getJdlconfigbean().setJobType("Normal");
 		configurationBean.getJdlconfigbean().setExecutable("/bin/echo");
-		configurationBean.getJdlconfigbean().setArguments("Hello");
+		configurationBean.getJdlconfigbean().setJDLArguments("Hello");
 		configurationBean.getJdlconfigbean().setStdOut("std.out");
 		configurationBean.getJdlconfigbean().setStdErr("std.err");
 		configurationBean.getJdlconfigbean().setInputSandbox("\"blah.txt\"");
