@@ -20,6 +20,7 @@ public class gLiteActivityConfigurationBean extends ActivityPortsDefinitionBean 
 	private String JDLPath;
 	private String OutputPath;
 	private String PollFrequency;
+	private String SE;
     private JDLConfigBean jdlconfigbean;
     
 	public String getWMSDir() {
@@ -121,6 +122,14 @@ public class gLiteActivityConfigurationBean extends ActivityPortsDefinitionBean 
 
 	public void setJdlconfigbean(JDLConfigBean jdlconfigbean) {
 		this.jdlconfigbean = jdlconfigbean;
+	}
+
+	public String getSE() {
+		return SE;
+	}
+
+	public void setSE(String SE) {
+		this.SE=SE;
 	}
 
 

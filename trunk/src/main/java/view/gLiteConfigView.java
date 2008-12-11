@@ -200,6 +200,7 @@ public class gLiteConfigView extends JPanel {
 		jLabelWMSDir = new javax.swing.JLabel();
 		jLabelOutputPath = new javax.swing.JLabel();
 		jLabelPollFrequency = new javax.swing.JLabel();
+		jLabelSE = new javax.swing.JLabel();
 
 		jTextFieldVO = new javax.swing.JTextField();
 		jTextFieldCADir = new javax.swing.JTextField();
@@ -211,6 +212,7 @@ public class gLiteConfigView extends JPanel {
 		jTextFieldWMSDir = new javax.swing.JTextField();
 		jTextFieldOutputPath = new javax.swing.JTextField();
 		jTextFieldPollFrequency = new javax.swing.JTextField();
+		jTextFieldSE = new javax.swing.JTextField();
 
 		jLabelVO.setText("VO");
 
@@ -231,10 +233,14 @@ public class gLiteConfigView extends JPanel {
 		jLabelOutputPath.setText("Output Path:");
 
 		jLabelPollFrequency.setText("Poll Frequency");
-
+		
+		jLabelSE.setText("SE");
+		
 		jTextFieldWMSDir.setColumns(30);
         jTextFieldWMSDir.setToolTipText("Points to a simple text file containing the server URLs for your VO");
 
+        
+        
 		jTextFieldVO.setColumns(30);
         jTextFieldVO.setToolTipText("Name of the VO");
 
@@ -262,6 +268,9 @@ public class gLiteConfigView extends JPanel {
 		jTextFieldPollFrequency.setColumns(30);
         jTextFieldPollFrequency.setToolTipText("Milliseconds you want to poll for the job status (20000(20sec) is a good time!)");
 
+        jTextFieldSE.setColumns(30);
+        jTextFieldSE.setToolTipText("Grid Storage Element");
+        
 		GroupLayout layout = new GroupLayout(propertiesPanel);
 		propertiesPanel.setLayout(layout);
 
@@ -367,75 +376,116 @@ public class gLiteConfigView extends JPanel {
 			}
 		});
 
-		layout.setHorizontalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
-				layout.createSequentialGroup().addContainerGap(15, Short.MAX_VALUE).addGroup(
-						layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
-								javax.swing.GroupLayout.Alignment.TRAILING,
-								layout.createSequentialGroup().addGroup(
-										layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING).addComponent(jLabelWMProxyURL).addComponent(jLabelProxyPath)
-												.addComponent(jLabelVOMSCertDir).addComponent(jLabelVOMSDir).addComponent(jLabelCADir).addComponent(jLabelVO).addComponent(
-														jLabelDelegationID)).addGap(38, 38, 38).addGroup(
-										layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(jTextFieldDelegationID,
-												javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-												javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jTextFieldVO, javax.swing.GroupLayout.Alignment.TRAILING,
-												javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(
-												jTextFieldCADir, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE,
-												javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jTextFieldVOMSDir,
-												javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-												javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jTextFieldVOMSCertDir, javax.swing.GroupLayout.Alignment.TRAILING,
-												javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(
-												jTextFieldProxyPath, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE,
-												javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jTextFieldProxyURL,
-												javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
-												javax.swing.GroupLayout.PREFERRED_SIZE))).addGroup(
-								javax.swing.GroupLayout.Alignment.TRAILING,
-								layout.createSequentialGroup().addComponent(jLabelWMSDir).addGap(38, 38, 38).addComponent(jTextFieldWMSDir, javax.swing.GroupLayout.PREFERRED_SIZE,
-										javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)).addGroup(
-								javax.swing.GroupLayout.Alignment.TRAILING,
-								layout.createSequentialGroup().addComponent(jLabelOutputPath).addGap(38, 38, 38).addComponent(jTextFieldOutputPath,
-										javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)).addGroup(
-								javax.swing.GroupLayout.Alignment.TRAILING,
-								layout.createSequentialGroup().addComponent(jLabelPollFrequency).addGap(38, 38, 38).addComponent(jTextFieldPollFrequency,
-										javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))).addContainerGap()));
+		jTextFieldSE.setText(configuration.getSE());
+		jTextFieldSE.addFocusListener(new FocusListener() {
+			public void focusGained(FocusEvent e) {
+			}
 
-		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] { jTextFieldCADir, jTextFieldDelegationID, jTextFieldProxyPath, jTextFieldVO,
-				jTextFieldVOMSCertDir });
+			public void focusLost(FocusEvent e) {
+				configuration.setSE(jTextFieldSE.getText());
+			}
+		});
 
-		layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
-				layout.createSequentialGroup().addContainerGap().addGroup(
-						layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jTextFieldVO, javax.swing.GroupLayout.PREFERRED_SIZE,
-								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabelVO)).addPreferredGap(
-						javax.swing.LayoutStyle.ComponentPlacement.RELATED).addGroup(
-						layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jTextFieldCADir, javax.swing.GroupLayout.PREFERRED_SIZE,
-								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabelCADir)).addPreferredGap(
-						javax.swing.LayoutStyle.ComponentPlacement.RELATED).addGroup(
-						layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jTextFieldVOMSDir, javax.swing.GroupLayout.PREFERRED_SIZE,
-								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabelVOMSDir)).addPreferredGap(
-						javax.swing.LayoutStyle.ComponentPlacement.RELATED).addGroup(
-						layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jTextFieldVOMSCertDir, javax.swing.GroupLayout.PREFERRED_SIZE,
-								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabelVOMSCertDir)).addPreferredGap(
-						javax.swing.LayoutStyle.ComponentPlacement.RELATED).addGroup(
-						layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jTextFieldProxyPath, javax.swing.GroupLayout.PREFERRED_SIZE,
-								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabelProxyPath)).addPreferredGap(
-						javax.swing.LayoutStyle.ComponentPlacement.RELATED).addGroup(
-						layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jTextFieldDelegationID, javax.swing.GroupLayout.PREFERRED_SIZE,
-								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabelDelegationID)).addPreferredGap(
-						javax.swing.LayoutStyle.ComponentPlacement.RELATED).addGroup(
-						layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jTextFieldProxyURL, javax.swing.GroupLayout.PREFERRED_SIZE,
-								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabelWMProxyURL)).addPreferredGap(
-						javax.swing.LayoutStyle.ComponentPlacement.RELATED).addGroup(
-						layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jTextFieldWMSDir, javax.swing.GroupLayout.PREFERRED_SIZE,
-								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabelWMSDir)).addPreferredGap(
-						javax.swing.LayoutStyle.ComponentPlacement.RELATED).addGroup(
-						layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jTextFieldOutputPath, javax.swing.GroupLayout.PREFERRED_SIZE,
-								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabelOutputPath)).addPreferredGap(
-						javax.swing.LayoutStyle.ComponentPlacement.RELATED).addGroup(
-						layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jTextFieldPollFrequency, javax.swing.GroupLayout.PREFERRED_SIZE,
-								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabelPollFrequency)).addContainerGap(27,
-						Short.MAX_VALUE)));
+		
+        layout.setHorizontalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap(43, Short.MAX_VALUE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jLabelWMProxyURL)
+                                .addComponent(jLabelProxyPath)
+                                .addComponent(jLabelVOMSCertDir)
+                                .addComponent(jLabelVOMSDir)
+                                .addComponent(jLabelCADir)
+                                .addComponent(jLabelVO)
+                                .addComponent(jLabelDelegationID))
+                            .addGap(38, 38, 38)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addComponent(jTextFieldDelegationID, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jTextFieldVO, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jTextFieldCADir, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jTextFieldVOMSDir, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jTextFieldVOMSCertDir, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jTextFieldProxyPath, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jTextFieldProxyURL, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addComponent(jLabelWMSDir)
+                            .addGap(38, 38, 38)
+                            .addComponent(jTextFieldWMSDir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addComponent(jLabelOutputPath)
+                            .addGap(38, 38, 38)
+                            .addComponent(jTextFieldOutputPath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                                .addComponent(jLabelSE)
+                                .addComponent(jLabelPollFrequency))
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                    .addGap(38, 38, 38)
+                                    .addComponent(jTextFieldPollFrequency, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addGroup(layout.createSequentialGroup()
+                                    .addGap(38, 38, 38)
+                                    .addComponent(jTextFieldSE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                    .addContainerGap())
+            );
 
-		layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] { jTextFieldCADir, jTextFieldDelegationID, jTextFieldProxyPath, jTextFieldVO,
-				jTextFieldVOMSCertDir });
+            layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jTextFieldCADir, jTextFieldDelegationID, jTextFieldProxyPath, jTextFieldVO, jTextFieldVOMSCertDir});
+
+            layout.setVerticalGroup(
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(layout.createSequentialGroup()
+                    .addContainerGap()
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jTextFieldVO, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabelVO))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jTextFieldCADir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabelCADir))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jTextFieldVOMSDir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabelVOMSDir))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jTextFieldVOMSCertDir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabelVOMSCertDir))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jTextFieldProxyPath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabelProxyPath))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jTextFieldDelegationID, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabelDelegationID))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jTextFieldProxyURL, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabelWMProxyURL))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jTextFieldWMSDir, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabelWMSDir))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jTextFieldOutputPath, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabelOutputPath))
+                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addGroup(layout.createSequentialGroup()
+                            .addComponent(jTextFieldPollFrequency, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                .addComponent(jTextFieldSE, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(jLabelSE)))
+                        .addComponent(jLabelPollFrequency))
+                    .addContainerGap(34, Short.MAX_VALUE))
+            );
+
+            layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jTextFieldCADir, jTextFieldDelegationID, jTextFieldProxyPath, jTextFieldVO, jTextFieldVOMSCertDir});
 
 		return propertiesPanel;
 	}
@@ -591,13 +641,13 @@ public class gLiteConfigView extends JPanel {
 			}
 		});
 
-		jTextFieldArguments.setText(configuration.getJdlconfigbean().getArguments());
+		jTextFieldArguments.setText(configuration.getJdlconfigbean().getJDLArguments());
 		jTextFieldArguments.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configuration.getJdlconfigbean().setArguments(jTextFieldArguments.getText());
+				configuration.getJdlconfigbean().setJDLArguments(jTextFieldArguments.getText());
 			}
 		});
 
@@ -1132,7 +1182,7 @@ public class gLiteConfigView extends JPanel {
 				gliteActivityConfigurationBean.getJdlconfigbean().setType(jTextFieldType.getText());
 				gliteActivityConfigurationBean.getJdlconfigbean().setJobType(jTextFieldJobType.getText());
 				gliteActivityConfigurationBean.getJdlconfigbean().setExecutable(jTextFieldExecutable.getText());
-				gliteActivityConfigurationBean.getJdlconfigbean().setArguments(jTextFieldArguments.getText());
+				gliteActivityConfigurationBean.getJdlconfigbean().setJDLArguments(jTextFieldArguments.getText());
 				gliteActivityConfigurationBean.getJdlconfigbean().setStdOut(jTextFieldStdOut.getText());
 				gliteActivityConfigurationBean.getJdlconfigbean().setStdErr(jTextFieldStdErr.getText());
 				gliteActivityConfigurationBean.getJdlconfigbean().setInputSandbox(jTextFieldInputSandbox.getText());
@@ -1155,6 +1205,7 @@ public class gLiteConfigView extends JPanel {
 				
 				gliteActivityConfigurationBean.setOutputPath(jTextFieldOutputPath.getText());
 				gliteActivityConfigurationBean.setPollFrequency(jTextFieldPollFrequency.getText());				
+				gliteActivityConfigurationBean.setSE(jTextFieldSE.getText());
 				
 				gliteActivityConfigurationBean.setInputPortDefinitions(inputBeanList);
 
@@ -1178,7 +1229,8 @@ public class gLiteConfigView extends JPanel {
 	private javax.swing.JLabel jLabelWMSDir;
 	private javax.swing.JLabel jLabelOutputPath;
 	private javax.swing.JLabel jLabelPollFrequency;
-
+	private javax.swing.JLabel jLabelSE;
+	
 	private javax.swing.JTextField jTextFieldCADir;
 	private javax.swing.JTextField jTextFieldDelegationID;
 	private javax.swing.JTextField jTextFieldProxyPath;
@@ -1189,6 +1241,7 @@ public class gLiteConfigView extends JPanel {
 	private javax.swing.JTextField jTextFieldWMSDir;
 	private javax.swing.JTextField jTextFieldOutputPath;
 	private javax.swing.JTextField jTextFieldPollFrequency;
+	private javax.swing.JTextField jTextFieldSE;
 
 	private javax.swing.JLabel jLabelExecutable;
 	private javax.swing.JLabel jLabelArguments;

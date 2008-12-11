@@ -8,15 +8,18 @@ public class JDLConfigBean {
 	private String StdErr;
 	private String InputSandbox;
 	private String OutputSandbox;
-	private String Arguments;
+	private String JDLArguments;
+	private String WrapperArguments;
 	private String NodeNumber;
 	private String InputsPath;
 	private String Requirements;
 	private String RetryCount;
 	private String Wrapper;
 	
+	
+	
 	public JDLConfigBean(String type, String jobType, String executable, String stdOut, String stdErr, String inputSandbox, String outputSandbox, String arguments,
-			String nodeNumber, String inputsPath, String requirements, String retryCount, String wrapper) {
+			String wrapperArguments, String nodeNumber, String inputsPath, String requirements, String retryCount, String wrapper) {
 		super();
 		Type = type;
 		JobType = jobType;
@@ -25,15 +28,14 @@ public class JDLConfigBean {
 		StdErr = stdErr;
 		InputSandbox = inputSandbox;
 		OutputSandbox = outputSandbox;
-		Arguments = arguments;
+		JDLArguments = arguments;
+		WrapperArguments = wrapperArguments;
 		NodeNumber = nodeNumber;
 		InputsPath = inputsPath;
 		Requirements = requirements;
 		RetryCount = retryCount;
 		Wrapper = wrapper;
 	}
-	
-	
 	public JDLConfigBean() {
 		// TODO Auto-generated constructor stub
 	}
@@ -79,12 +81,6 @@ public class JDLConfigBean {
 	public void setOutputSandbox(String outputSandbox) {
 		OutputSandbox = outputSandbox;
 	}
-	public String getArguments() {
-		return Arguments;
-	}
-	public void setArguments(String arguments) {
-		Arguments = arguments;
-	}
 	public String getNodeNumber() {
 		return NodeNumber;
 	}
@@ -114,6 +110,26 @@ public class JDLConfigBean {
 	}
 	public void setWrapper(String wrapper) {
 		Wrapper = wrapper;
+	}
+
+
+	public String getJDLArguments() {
+		return JDLArguments;
+	}
+
+
+	public void setJDLArguments(String arguments) {
+		JDLArguments = arguments;
+	}
+
+
+	public String getWrapperArguments() {
+		return WrapperArguments;
+	}
+
+
+	public void setWrapperArguments(String wrapperArguments) {
+		WrapperArguments = wrapperArguments;
 	}
 	
 
