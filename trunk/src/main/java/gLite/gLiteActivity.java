@@ -206,27 +206,25 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					GridSession session;
 					int retrycount=0;
 					long start_time = System.currentTimeMillis();
-					
+
+					config = new GridSessionConfig();
+					// path to CA certificates
+					config.setCADir(configurationBean.getCaDir());
+					// paths to VOMS configuration files and certificates
+					config.setVOMSDir(configurationBean.getVOMSDir());
+					config.setVOMSCertDir(configurationBean.getVOMSCertDir());
+					// path to WMProxy configuration files
+					config.setWMSDir(configurationBean.getWMSDir());
+					config.addWMProxy(configurationBean.getVO(), configurationBean.getWMProxy());
+					config.setProxyPath(configurationBean.getProxyPath());
+
 					jobsubmitloop: while(true){
 						if(retrycount>3){
 							System.out.println("Too many retries done!! Quitting!!!");
 							System.exit(1);
-						}
-						
-						config = new GridSessionConfig();
-						// path to CA certificates
-						config.setCADir(configurationBean.getCaDir());
-						// paths to VOMS configuration files and certificates
-						config.setVOMSDir(configurationBean.getVOMSDir());
-						config.setVOMSCertDir(configurationBean.getVOMSCertDir());
-						// path to WMProxy configuration files
-						config.setWMSDir(configurationBean.getWMSDir());
-						config.addWMProxy(configurationBean.getVO(), configurationBean.getWMProxy());
-						config.setProxyPath(configurationBean.getProxyPath());
-					
+						}					
 						// create Grid session
 						session = GridSessionFactory.create(config);
-					
 						//String jobid = submitjob(configurationBean, config, session,proxy);
 						try {
 							// Delegate user proxy to WMProxy server
@@ -250,7 +248,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						String jobId = null;
 					
 						try {
-							jobId = session.submitJob(jdl, configurationBean.getJdlconfigbean().getInputsPath());
+							jobId = session.submitJob(jdl,configurationBean.getJdlconfigbean().getInputsPath());
 						} catch (GridAPIException e) {
 							e.printStackTrace();
 						}
@@ -267,7 +265,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							Thread.sleep(Long.parseLong(configurationBean.getPollFrequency()));
 							jobState = session.getJobState(jobId);
 							
-							
 							if (jobState.equals("WAITING")&&!flaginwaiting){
 								System.out.println("Waiting state counter started!");
 								start_time_in_waiting_state=System.currentTimeMillis();
@@ -283,11 +280,13 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							if(((System.currentTimeMillis()-start_time_in_waiting_state>=900000)&&jobState.equals("WAITING"))){
 								System.out.println("Resubmitting because taking too much time in WAITING state");
 								retrycount++;
+								session.cancelJob(jobId);
 								continue jobsubmitloop;
 							}
 							if(((System.currentTimeMillis()-start_time_in_scheduled_state>=900000)&&jobState.equals("SCHEDULED"))){
 								System.out.println("Resubmitting because taking too much time in SCHEDULED state");
 								retrycount++;
+								session.cancelJob(jobId);
 								continue jobsubmitloop;
 							}
 							System.out.println("Job status: " + jobId + " : " + jobState);
@@ -296,6 +295,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						if(jobState.equals("ABORTED")){
 							System.out.println("Resubmitting because aborted");
 							retrycount++;
+							session.cancelJob(jobId);
 							continue ;
 						}
 					
@@ -484,8 +484,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 	}
 
 	private static String getRandomString() {
-		Random r = new Random();
-		return Long.toString(Math.abs(r.nextLong()), 36).substring(0, 5);
+		return java.util.UUID.randomUUID().toString().substring(0, 5);
 	}
 
 	private static void displayPortDetails() {
