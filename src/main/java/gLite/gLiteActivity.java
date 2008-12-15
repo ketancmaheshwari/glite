@@ -1,6 +1,5 @@
 package gLite;
 
-import java.util.Random;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -50,7 +49,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 	private static String innerarg;
 
 	@Override
-	public void configure(gLiteActivityConfigurationBean configurationBean) throws ActivityConfigurationException {
+	public synchronized void configure(gLiteActivityConfigurationBean configurationBean) throws ActivityConfigurationException {
 		// grid_storage_element="prod-se-01.pd.infn.it";
 		// grid_storage_element="lxfs07.jinr.ru";
 		// grid_storage_element="marsedpm.in2p3.fr";
@@ -120,17 +119,12 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							if (/* first part is file */getPart(nextinput, 1).equals("file")) {
 								datanamemap.put(nextinput, getRandomString());
 								Runtime.getRuntime().exec("scp /home/ketan/ManchesterWork/gliteworkflows/inputs/" + getPart(nextinput, 2) + " glite.unice.fr:");
-								System.out.println("scp /home/ketan/ManchesterWork/gliteworkflows/inputs/" + getPart(nextinput, 2) + " glite.unice.fr:");
 								// Transfer this to grid
 								Runtime.getRuntime().exec("ssh glite.unice.fr lcg-del -a lfn:" + datanamemap.get(nextinput));
-								System.out.println("ssh glite.unice.fr lcg-del -a lfn:" + datanamemap.get(nextinput));
-								// upload the data on the grid with a random
-								// name
+								// upload the data on the grid with a random name
 								Runtime.getRuntime().exec(
 										"ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element + " file://`pwd`/"
 												+ getPart(nextinput, 2));
-								System.out.println("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element + " file://`pwd`/"
-										+ getPart(nextinput, 2));
 							} else if (getPart(nextinput, 1).equals("lfn")) {
 								System.out.println("wfinput is " + getPart(nextinput, 2));
 							}
@@ -249,7 +243,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					
 						try {
 							jobId = session.submitJob(jdl,configurationBean.getJdlconfigbean().getInputsPath());
-						} catch (GridAPIException e) {
+						} catch (Exception e) {
 							e.printStackTrace();
 						}
 
@@ -258,9 +252,11 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						String jobState = "";
 						boolean flaginwaiting=false;
 						boolean flaginscheduled=false;
+						boolean flaginready=false;
 						long start_time_in_waiting_state=System.currentTimeMillis();
 						long start_time_in_scheduled_state=System.currentTimeMillis();
-
+						long start_time_in_ready_state=System.currentTimeMillis();
+						
 						do {
 							Thread.sleep(Long.parseLong(configurationBean.getPollFrequency()));
 							jobState = session.getJobState(jobId);
@@ -271,6 +267,12 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 								flaginwaiting=true;
 							}
 							
+							if (jobState.equals("READY")&&!flaginready){
+								System.out.println("Ready state counter started!");
+								start_time_in_ready_state=System.currentTimeMillis();
+								flaginready=true;
+							}
+							
 							if (jobState.equals("SCHEDULED")&&!flaginscheduled){
 								System.out.println("Scheduled state counter started!");
 								start_time_in_waiting_state=System.currentTimeMillis();
@@ -279,6 +281,12 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							
 							if(((System.currentTimeMillis()-start_time_in_waiting_state>=900000)&&jobState.equals("WAITING"))){
 								System.out.println("Resubmitting because taking too much time in WAITING state");
+								retrycount++;
+								session.cancelJob(jobId);
+								continue jobsubmitloop;
+							}
+							if(((System.currentTimeMillis()-start_time_in_ready_state>=900000)&&jobState.equals("SCHEDULED"))){
+								System.out.println("Resubmitting because taking too much time in SCHEDULED state");
 								retrycount++;
 								session.cancelJob(jobId);
 								continue jobsubmitloop;
