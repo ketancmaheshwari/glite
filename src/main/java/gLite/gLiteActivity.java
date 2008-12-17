@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
@@ -19,14 +18,16 @@ import jlite.GridSession;
 import jlite.GridSessionConfig;
 import jlite.GridSessionFactory;
 import jlite.util.Util;
-import net.sf.taverna.t2.reference.ExternalReferenceSPI;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
+import net.sf.taverna.t2.workflowmodel.Edit;
+import net.sf.taverna.t2.workflowmodel.Edits;
 import net.sf.taverna.t2.workflowmodel.OutputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
+import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityPortsDefinitionBean;
 
 import org.glite.jdl.JobAd;
 import org.globus.gsi.GlobusCredential;
@@ -49,23 +50,17 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 	private static String innerarg;
 
 	@Override
-	public synchronized void configure(gLiteActivityConfigurationBean configurationBean) throws ActivityConfigurationException {
-		// grid_storage_element="prod-se-01.pd.infn.it";
-		// grid_storage_element="lxfs07.jinr.ru";
-		// grid_storage_element="marsedpm.in2p3.fr";
-		// grid_storage_element="polgrid4.in2p3.fr";
-		// grid_storage_element="srm.glite.ecdf.ed.ac.uk";
-		// grid_storage_element="tbn18.nikhef.nl";
-		// grid_storage_element="grid-se.lns.infn.it";
-		// grid_storage_element="se01.dur.scotgrid.ac.uk";
-		// grid_storage_element="hepgrid11.ph.liv.ac.uk";
-		// grid_storage_element="cirigridse01.univ-bpclermont.fr";
-
+	public  void configure(gLiteActivityConfigurationBean configurationBean) throws ActivityConfigurationException {
+		ActivityPortsDefinitionBean activityports = new ActivityPortsDefinitionBean();
+		
+		activityports.setInputPortDefinitions(configurationBean.getInputPortDefinitions());
+		activityports.setOutputPortDefinitions(configurationBean.getOutputPortDefinitions());
+		
 		this.configurationBean = configurationBean;
-		configurePorts(configurationBean);
-		List<Class<? extends ExternalReferenceSPI>> handledReferenceSchemes = new ArrayList<Class<? extends ExternalReferenceSPI>>();
-		addInput("datain", 0, true, handledReferenceSchemes, String.class);
-		addOutput("dataout", 0, 0);
+		configurePorts(activityports);
+	//	List<Class<? extends ExternalReferenceSPI>> handledReferenceSchemes = new ArrayList<Class<? extends ExternalReferenceSPI>>();
+	//	addInput("datain", 1, true, handledReferenceSchemes, String.class);
+	//	addOutput("dataout", 1, 0);
 	}
 
 	@Override

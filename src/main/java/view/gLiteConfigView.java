@@ -178,7 +178,7 @@ public class gLiteConfigView extends JPanel {
 		portEditPanel.add(inputScroller, panelConstraint);
 
 		panelConstraint.gridy = 1;
-		ports.add("Inputs Ports", inputScroller);
+		ports.add("Input Ports", inputScroller);
 		JScrollPane outputScroller = new JScrollPane(setOutputPanel());
 		portEditPanel.add(outputScroller, panelConstraint);
 		ports.add("Output Ports", outputScroller);
@@ -796,8 +796,14 @@ public class gLiteConfigView extends JPanel {
 
 			inputConstraint.gridx = 0;
 			final JTextField nameField = gliteInputViewer.getNameField();
+			final JSpinner depthspinner = gliteInputViewer.getDepthSpinner();
 			inputConstraint.weightx = 0.1;
 			inputEditPanel.add(nameField, inputConstraint);
+			
+			inputConstraint.weightx = 0;
+			inputConstraint.gridx = 1;
+			inputEditPanel.add(depthspinner, inputConstraint);
+			
 			inputConstraint.weightx = 0.0;
 			inputConstraint.gridx = 1;
 			inputConstraint.gridx = 2;
@@ -941,13 +947,13 @@ public class gLiteConfigView extends JPanel {
 			// existing code of beanshells. may be a disaster
 			// ActivityOutputPortDefinitionBean outputBean = new
 			// ActivityOutputPortDefinitionBean();
-			outputBean.setDepth(outputBean.getDepth());
-			outputBean.setGranularDepth(outputBean.getGranularDepth());
 			List<String> mimeTypes = new ArrayList<String>();
 			mimeTypes.add("text/plain");
 			outputBean.setMimeTypes(mimeTypes);
 			outputConstraint.gridy = outputGridy;
+			
 			final gLiteOutputViewer gliteOutputViewer = new gLiteOutputViewer(outputBean, true);
+			
 			outputViewList.add(gliteOutputViewer);
 			outputConstraint.gridx = 0;
 			outputConstraint.weightx = 0.1;
@@ -958,11 +964,13 @@ public class gLiteConfigView extends JPanel {
 			final JSpinner depthSpinner = gliteOutputViewer.getDepthSpinner();
 			outputEditPanel.add(depthSpinner, outputConstraint);
 			outputConstraint.gridx = 2;
+			outputBean.setDepth((Integer)depthSpinner.getValue());
 			final JSpinner granularDepthSpinner = gliteOutputViewer.getGranularDepthSpinner();
 			outputEditPanel.add(granularDepthSpinner, outputConstraint);
+			outputBean.setGranularDepth((Integer)granularDepthSpinner.getValue());
 			outputConstraint.gridx = 3;
 			outputConstraint.gridx = 4;
-
+			
 			final JButton removeButton = new JButton("remove");
 			removeButton.addActionListener(new AbstractAction() {
 
