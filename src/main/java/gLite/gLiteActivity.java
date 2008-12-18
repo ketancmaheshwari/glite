@@ -242,7 +242,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							e.printStackTrace();
 						}
 
-						System.out.println("Started job: " + jobId + " (" + configurationBean.getJdlconfigbean().getExecutable()+") ");
+						System.out.println("Started job with Id : " + jobId + " (" + configurationBean.getJdlconfigbean().getExecutable()+") ");
 						// Monitor job status
 						String jobState = "";
 						boolean flaginwaiting=false;
@@ -292,7 +292,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 								session.cancelJob(jobId);
 								continue jobsubmitloop;
 							}
-							System.out.println("Job status: " + jobId + " : " + jobState);
+							System.out.println("Job status: " + configurationBean.getJdlconfigbean().getExecutable() + " : " + jobState);
 						} while (!jobState.equals("DONE") && !jobState.equals("ABORTED"));
 						
 						if(jobState.equals("ABORTED")){
