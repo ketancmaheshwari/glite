@@ -242,7 +242,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							e.printStackTrace();
 						}
 
-						System.out.println("Started job: " + jobId);
+						System.out.println("Started job: " + jobId + " (" + configurationBean.getJdlconfigbean().getExecutable()+") ");
 						// Monitor job status
 						String jobState = "";
 						boolean flaginwaiting=false;
