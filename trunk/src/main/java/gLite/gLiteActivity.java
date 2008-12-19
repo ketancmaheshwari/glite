@@ -279,7 +279,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						if(jobState.equals("ABORTED")){
 							System.out.println("Resubmitting because aborted");
 							retrycount++;
-							session.cancelJob(jobId);
 							continue ;
 						}
 					
