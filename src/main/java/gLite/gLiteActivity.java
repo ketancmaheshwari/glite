@@ -20,14 +20,11 @@ import jlite.GridSessionFactory;
 import jlite.util.Util;
 import net.sf.taverna.t2.reference.ReferenceService;
 import net.sf.taverna.t2.reference.T2Reference;
-import net.sf.taverna.t2.workflowmodel.Edit;
-import net.sf.taverna.t2.workflowmodel.Edits;
 import net.sf.taverna.t2.workflowmodel.OutputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AbstractAsynchronousActivity;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityConfigurationException;
 import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
-import net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityPortsDefinitionBean;
 
 import org.glite.jdl.JobAd;
 import org.globus.gsi.GlobusCredential;
@@ -43,7 +40,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 	private gLiteActivityConfigurationBean configurationBean;
 	private String outputDir;
 	private static String grid_storage_element;
-	// private static ArrayList<String> wfinput;
 	private static TreeMap<String, String> wfinput;
 	private static ArrayList<String> wfoutput;
 	private static HashMap<String, String> datanamemap = new HashMap<String, String>();
@@ -51,16 +47,9 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 
 	@Override
 	public  void configure(gLiteActivityConfigurationBean configurationBean) throws ActivityConfigurationException {
-		ActivityPortsDefinitionBean activityports = new ActivityPortsDefinitionBean();
-		
-		activityports.setInputPortDefinitions(configurationBean.getInputPortDefinitions());
-		activityports.setOutputPortDefinitions(configurationBean.getOutputPortDefinitions());
 		
 		this.configurationBean = configurationBean;
-		configurePorts(activityports);
-	//	List<Class<? extends ExternalReferenceSPI>> handledReferenceSchemes = new ArrayList<Class<? extends ExternalReferenceSPI>>();
-	//	addInput("datain", 1, true, handledReferenceSchemes, String.class);
-	//	addOutput("dataout", 1, 0);
+		configurePorts(configurationBean);
 	}
 
 	@Override
@@ -87,31 +76,25 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 
 				Map<String, T2Reference> outputData = new HashMap<String, T2Reference>();
 				try {
-					// set inputs
-					// wfinput = new ArrayList<String>();
 					wfinput = new TreeMap<String, String>();
 					String nextinput;
+					grid_storage_element = configurationBean.getSE();
 					synchronized (wfinput) {
-
-						grid_storage_element = configurationBean.getSE();
-
 						for (String inputName : data.keySet()) {
 							ActivityInputPort inputPort = getInputPort(inputName);
 							inputName = sanatisePortName(inputName);
 							input = referenceService.renderIdentifier(data.get(inputName), inputPort.getTranslatedElementClass(), callback.getContext());
-							// wfinput.add(input.toString());
 							wfinput.put(inputName, input.toString());
 						}
-
-						// sort the input ports first
-						// Collections.sort(wfinput);
 					}
-					Collection<String> inputportvalues = wfinput.values();
+					
+					Collection<String> inputportvalues = wfinput.values();	
+					
 					synchronized (wfinput) {
 						for (Iterator<String> iterator = inputportvalues.iterator(); iterator.hasNext();) {
 							// If inputName starts with 'file' transfer it to ui
 							nextinput = (String) iterator.next();
-							if (/* first part is file */getPart(nextinput, 1).equals("file")) {
+							if (getPart(nextinput, 1).equals("file")) {
 								datanamemap.put(nextinput, getRandomString());
 								Runtime.getRuntime().exec("scp /home/ketan/ManchesterWork/gliteworkflows/inputs/" + getPart(nextinput, 2) + " glite.unice.fr:");
 								// Transfer this to grid
@@ -173,8 +156,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						System.err.println("exception in creating args");
 						System.err.println(e.getLocalizedMessage());
 					}
-
-					displayPortDetails();
 
 					innerarg = new String();
 					innerarg = configurationBean.getJdlconfigbean().getJDLArguments();
@@ -417,16 +398,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		f.println("#export current path and run the executable");
 		f.println("export PATH=.:$PATH");
 		f.println("/bin/chmod 755 " + glb.getJdlconfigbean().getExecutable());
-		// create the files corresponding to the outputports
-		/*
-		 * try{ for (int i = 0; i < wfoutput.size(); i++) {
-		 * if(datanamemap.get(wfoutput.get(i))!=null)
-		 * f.println("touch "+getPart(datanamemap.get(wfoutput.get(i)),2)); }
-		 * }catch (Exception e) { System.err.println("exception in touch");
-		 * System.err.println(e.getMessage());
-		 * System.err.println(e.getLocalizedMessage()); // TODO: handle
-		 * exception }
-		 */
 
 		// put executable with all ports marked with data as arguments
 		f.println(glb.getJdlconfigbean().getExecutable() + " " + innerarg);
@@ -435,20 +406,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		f.println("TOTAL=`expr $STOP - $START`");
 		f.println("echo \"Total running time: $TOTAL seconds\"");
 		f.println("DATA_TRANSFER_TO_GRID_START=`date +%s`");
-
-		// f.println("#Treating input ports ..");
-
-		// for (int i = 0; i < wfinput.size(); i++) {
-		/*
-		 * for (Iterator<String> iterator = inputvalues.iterator();
-		 * iterator.hasNext();) { nextinput=(String)iterator.next();
-		 * if(getPart(nextinput, 1).equals("lfn")){
-		 * f.println("#lcg-del --vo biomed -a lfn:" + getPart(nextinput,2)); //
-		 * introduce a delay for updation of the lcg catalogue
-		 * f.println("lcg-cr --vo biomed -l lfn:" + getPart(nextinput,2) +
-		 * " -d "+grid_storage_element+" file://$(pwd)/" +
-		 * getPart(nextinput,2)); f.println("/bin/sleep 7"); } }
-		 */
 
 		f.println("#Treating output ports ...");
 		for (int i = 0; i < wfoutput.size(); i++) {
@@ -488,17 +445,5 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 
 	private static String getRandomString() {
 		return java.util.UUID.randomUUID().toString().substring(0, 5);
-	}
-
-	private static void displayPortDetails() {
-		/*
-		 * for (int i = 0; i < wfinput.size(); i++) {
-		 * System.out.println(wfinput.
-		 * get(i)+" ==> "+datanamemap.get(wfinput.get(i))); }
-		 */
-
-		for (int i = 0; i < wfoutput.size(); i++) {
-			System.out.println("Output port " + wfoutput.get(i) + " ==> " + datanamemap.get(wfoutput.get(i)));
-		}
 	}
 }
