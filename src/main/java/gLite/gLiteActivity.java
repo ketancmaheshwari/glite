@@ -189,7 +189,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					}
 
 					GridSessionConfig config=null;
-					GridSession session;
+					GridSession session=null;
 					int retrycount=0;
 					long start_time = System.currentTimeMillis();
 
@@ -210,36 +210,48 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							System.exit(1);
 						}					
 						// create Grid session
-						session = GridSessionFactory.create(config);
-						//String jobid = submitjob(configurationBean, config, session,proxy);
-						try {
-							// Delegate user proxy to WMProxy server
-							session.delegateProxy(configurationBean.getDelegationID());
-						} catch (GridAPIException e) {
-							e.printStackTrace();
+						synchronized (session) {
+							session = GridSessionFactory.create(config);	
+
+							//String jobid = submitjob(configurationBean, config, session,proxy);
+							try {
+								// Delegate user proxy to WMProxy server
+								session.delegateProxy(configurationBean.getDelegationID());
+							} catch (GridAPIException e) {
+								e.printStackTrace();
+							}
 						}
 
 						// Load job description
 						JobAd jad = new JobAd();
-
-						try {
-							jad.fromFile(configurationBean.getJDLPath());
-						} catch (Exception e) {
-							e.printStackTrace();
-						}
-
-						String jdl = jad.toString();
-
-						// Submit job to grid
 						String jobId = null;
+						synchronized (jad) {
 
-						try {
-							jobId = session.submitJob(jdl,configurationBean.getJdlconfigbean().getInputsPath());
-						} catch (Exception e) {
-							e.printStackTrace();
+							try {
+								jad.fromFile(configurationBean.getJDLPath());
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+
+							String jdl = jad.toString();
+
+							// Submit job to grid
+
+							try {
+								jobId = session.submitJob(jdl,configurationBean.getJdlconfigbean().getInputsPath());
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+							
+							//resubmit if jobid is null
+							if(jobId.equals(null)){
+								System.out.println("Resubmitting because jobId is returned as null");
+								continue;
+							}
+							
+							
+							System.out.println("Started job with Id : " + jobId + " (" + configurationBean.getJdlconfigbean().getExecutable()+") ");
 						}
-
-						System.out.println("Started job with Id : " + jobId + " (" + configurationBean.getJdlconfigbean().getExecutable()+") ");
 						// Monitor job status
 						String jobState = "";
 						boolean flaginwaiting=false;
