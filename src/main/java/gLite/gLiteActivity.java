@@ -40,14 +40,14 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 	private gLiteActivityConfigurationBean configurationBean;
 	private String outputDir;
 	private static String grid_storage_element;
-	private static TreeMap<String, String> wfinput;
-	private static ArrayList<String> wfoutput;
+	//private static TreeMap<String, String> wfinput;
+	//private static ArrayList<String> wfoutput;
 	private static HashMap<String, String> datanamemap = new HashMap<String, String>();
 	private static String innerarg;
 
 	@Override
 	public  void configure(gLiteActivityConfigurationBean configurationBean) throws ActivityConfigurationException {
-		
+
 		this.configurationBean = configurationBean;
 		configurePorts(configurationBean);
 	}
@@ -71,14 +71,17 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		callback.requestRun(new Runnable() {
 
 			public void run() {
-
 				ReferenceService referenceService = callback.getContext().getReferenceService();
 
 				Map<String, T2Reference> outputData = new HashMap<String, T2Reference>();
+
+				TreeMap<String, String> wfinput = new TreeMap<String, String>();
+
 				try {
-					wfinput = new TreeMap<String, String>();
+
 					String nextinput;
 					grid_storage_element = configurationBean.getSE();
+
 					synchronized (wfinput) {
 						for (String inputName : data.keySet()) {
 							ActivityInputPort inputPort = getInputPort(inputName);
@@ -87,10 +90,10 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							wfinput.put(inputName, input.toString());
 						}
 					}
-					
+
 					Collection<String> inputportvalues = wfinput.values();	
-					
-					synchronized (wfinput) {
+
+					synchronized (inputportvalues) {
 						for (Iterator<String> iterator = inputportvalues.iterator(); iterator.hasNext();) {
 							// If inputName starts with 'file' transfer it to ui
 							nextinput = (String) iterator.next();
@@ -102,25 +105,28 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 								// upload the data on the grid with a random name
 								Runtime.getRuntime().exec(
 										"ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element + " file://`pwd`/"
-												+ getPart(nextinput, 2));
+										+ getPart(nextinput, 2));
 							} else if (getPart(nextinput, 1).equals("lfn")) {
 								System.out.println("wfinput is " + getPart(nextinput, 2));
 							}
 						}
 					}
-
-					wfoutput = new ArrayList<String>();
+					ArrayList<String> wfoutput = new ArrayList<String>();
 					// register outputs
-					for (OutputPort outputPort : getOutputPorts()) {
-						wfoutput.add(outputPort.getName());
-						Object value = null;
-						datanamemap.put(outputPort.getName(), "lfn:" + getRandomString());
-						value = datanamemap.get(outputPort.getName());
-						if (value != null) {
-							outputData.put(outputPort.getName(), referenceService.register(value, outputPort.getDepth(), true, callback.getContext()));
+					synchronized (wfoutput) {
+
+
+						for (OutputPort outputPort : getOutputPorts()) {
+							wfoutput.add(outputPort.getName());
+							Object value = null;
+							datanamemap.put(outputPort.getName(), "lfn:" + getRandomString());
+							value = datanamemap.get(outputPort.getName());
+							if (value != null) {
+								outputData.put(outputPort.getName(), referenceService.register(value, outputPort.getDepth(), true, callback.getContext()));
+							}
+							// clear outputs
+							// TODO
 						}
-						// clear outputs
-						// TODO
 					}
 
 					String wrapperarg = new String();
@@ -128,25 +134,27 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					// create a string with all input and output ports separated
 					// by space
 					try {
-						for (Iterator<String> iterator = inputportvalues.iterator(); iterator.hasNext();) {
-							nextinput = (String) iterator.next();
-							if (getPart(nextinput, 1).equals("lfn")) {
-								wrapperarg = wrapperarg + " " + getPart(nextinput, 2);
-							} else if (datanamemap.get(nextinput) != null) {
-								wrapperarg = wrapperarg + " " + datanamemap.get(nextinput);
+						synchronized (inputportvalues) {
+							for (Iterator<String> iterator = inputportvalues.iterator(); iterator.hasNext();) {
+								nextinput = (String) iterator.next();
+								if (getPart(nextinput, 1).equals("lfn")) {
+									wrapperarg = wrapperarg + " " + getPart(nextinput, 2);
+								} else if (datanamemap.get(nextinput) != null) {
+									wrapperarg = wrapperarg + " " + datanamemap.get(nextinput);
+								}
+							}
+						}
+						// sort outputport names
+						synchronized (wfoutput) {
+							Collections.sort(wfoutput);	
+							for (Iterator<String> iterator = wfoutput.iterator(); iterator.hasNext();) {
+								nextinput = (String) iterator.next();
+								if (datanamemap.get(nextinput) != null)
+									wrapperarg = wrapperarg + " " + getPart(datanamemap.get(nextinput), 2);
 							}
 						}
 
-						// sort outputport names
-						Collections.sort(wfoutput);
-
-						for (Iterator<String> iterator = wfoutput.iterator(); iterator.hasNext();) {
-							nextinput = (String) iterator.next();
-							if (datanamemap.get(nextinput) != null)
-								wrapperarg = wrapperarg + " " + getPart(datanamemap.get(nextinput), 2);
-						}
-
-						System.out.println("Wrapper arg is  " + wrapperarg);
+						System.out.println("Wrapper arg is  "+configurationBean.getJdlconfigbean().getExecutable() +" "+ wrapperarg);
 					} catch (IllegalArgumentException iae) {
 						System.err.println("exception in creating args");
 						System.err.println(iae.getMessage());
@@ -160,8 +168,16 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					innerarg = new String();
 					innerarg = configurationBean.getJdlconfigbean().getJDLArguments();
 					configurationBean.getJdlconfigbean().setWrapperArguments(wrapperarg);
-					configurationBean.getJdlconfigbean().setWrapper(createWrapper(configurationBean));
+					configurationBean.getJdlconfigbean().setWrapper(createWrapper(configurationBean,wfinput,wfoutput));
 					configurationBean.setJDLPath(createJDL(configurationBean));
+					synchronized (wfinput) {
+						wfinput.clear();	
+					}
+					synchronized (wfoutput) {
+						wfoutput.clear();	
+					}
+
+					///QUOTING FROM HERE TO MAKE IT DUMMY
 
 					GlobusCredential proxy=null;
 					try {
@@ -202,10 +218,10 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						} catch (GridAPIException e) {
 							e.printStackTrace();
 						}
-					
+
 						// Load job description
 						JobAd jad = new JobAd();
-					
+
 						try {
 							jad.fromFile(configurationBean.getJDLPath());
 						} catch (Exception e) {
@@ -216,7 +232,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 
 						// Submit job to grid
 						String jobId = null;
-					
+
 						try {
 							jobId = session.submitJob(jdl,configurationBean.getJdlconfigbean().getInputsPath());
 						} catch (Exception e) {
@@ -232,29 +248,29 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						long start_time_in_waiting_state=System.currentTimeMillis();
 						long start_time_in_scheduled_state=System.currentTimeMillis();
 						long start_time_in_ready_state=System.currentTimeMillis();
-						
+
 						do {
 							Thread.sleep(Long.parseLong(configurationBean.getPollFrequency()));
 							jobState = session.getJobState(jobId);
-							
+
 							if (jobState.equals("WAITING")&&!flaginwaiting){
 								System.out.println("Waiting state counter started!");
 								start_time_in_waiting_state=System.currentTimeMillis();
 								flaginwaiting=true;
 							}
-							
+
 							if (jobState.equals("READY")&&!flaginready){
 								System.out.println("Ready state counter started!");
 								start_time_in_ready_state=System.currentTimeMillis();
 								flaginready=true;
 							}
-							
+
 							if (jobState.equals("SCHEDULED")&&!flaginscheduled){
 								System.out.println("Scheduled state counter started!");
 								start_time_in_waiting_state=System.currentTimeMillis();
 								flaginscheduled=true;
 							}
-							
+
 							if(((System.currentTimeMillis()-start_time_in_waiting_state>=900000)&&jobState.equals("WAITING"))){
 								System.out.println("Resubmitting because taking too much time in WAITING state");
 								retrycount++;
@@ -275,13 +291,13 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							}
 							System.out.println("Job status: " + configurationBean.getJdlconfigbean().getExecutable() + " : " + jobState);
 						} while (!jobState.equals("DONE") && !jobState.equals("ABORTED"));
-						
+
 						if(jobState.equals("ABORTED")){
 							System.out.println("Resubmitting because aborted");
 							retrycount++;
 							continue ;
 						}
-					
+
 						// Download job output
 						if (jobState.equals("DONE")) {
 							System.out.println("output path=" + configurationBean.getOutputPath());
@@ -291,12 +307,13 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							break;
 						}
 					}
-					
+
 					long end_time = System.currentTimeMillis();
 					long elapsed_time = (end_time - start_time) / 1000;
 					System.out.println("The Job took " + elapsed_time + " seconds to complete.");
-					
-					
+
+					//QUOTE UNTIL HERE TO MAKE IT DUMMY
+
 					// send result to the callback
 					callback.receiveResult(outputData, new int[0]);
 
@@ -306,7 +323,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 				}
 			}
 
-			
 			/**
 			 * Removes any invalid characters from the port name. For example,
 			 * xml-text would become xmltext.
@@ -355,7 +371,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		return jdlfile.getAbsolutePath();
 	}
 
-	public static String createWrapper(gLiteActivityConfigurationBean glb) throws IOException {
+	public static String createWrapper(gLiteActivityConfigurationBean glb, TreeMap<String, String> wfinput, ArrayList<String> wfoutput) throws IOException {
 
 		File wrapperfile = new File(glb.getJdlconfigbean().getInputsPath(), "wrapper_" + System.currentTimeMillis() + ".sh");
 		PrintWriter f = new PrintWriter(new FileWriter(wrapperfile));
@@ -372,20 +388,22 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		Collection<String> inputvalues = wfinput.values();
 		String nextinput;
 		// for (int i = 0; i < wfinput.size(); i++) {
-		for (Iterator<String> iterator = inputvalues.iterator(); iterator.hasNext();) {
-			nextinput = (String) iterator.next();
-			if (getPart(nextinput, 1).equals("lfn")) {
-				f.println("#rm -f " + getPart(nextinput, 2));
-				f.println("lcg-cp --vo biomed lfn:" + getPart(nextinput, 2) + " file://$(pwd)/" + getPart(nextinput, 2));
-				f.println("if [ $? -ne 0 ]; then lcg-cp --vo biomed lfn:" + getPart(nextinput, 2) + " file://$(pwd)/" + getPart(nextinput, 2));
-				f.println("fi;");
-				f.println("/bin/sleep 7");
-			}
-			if (getPart(nextinput, 1).equals("file")) {
-				f.println("lcg-cp --vo biomed lfn:" + datanamemap.get(nextinput) + " file://$(pwd)/" + datanamemap.get(nextinput));
-				f.println("if [ $? -ne 0 ]; then lcg-cp --vo biomed lfn:" + datanamemap.get(nextinput) + " file://$(pwd)/" + datanamemap.get(nextinput));
-				f.println("fi;");
-				f.println("/bin/sleep 10");
+		synchronized (inputvalues) {
+			for (Iterator<String> iterator = inputvalues.iterator(); iterator.hasNext();) {
+				nextinput = (String) iterator.next();
+				if (getPart(nextinput, 1).equals("lfn")) {
+					f.println("#rm -f " + getPart(nextinput, 2));
+					f.println("lcg-cp --vo biomed lfn:" + getPart(nextinput, 2) + " file://$(pwd)/" + getPart(nextinput, 2));
+					f.println("if [ $? -ne 0 ]; then lcg-cp --vo biomed lfn:" + getPart(nextinput, 2) + " file://$(pwd)/" + getPart(nextinput, 2));
+					f.println("fi;");
+					f.println("/bin/sleep 7");
+				}
+				if (getPart(nextinput, 1).equals("file")) {
+					f.println("lcg-cp --vo biomed lfn:" + datanamemap.get(nextinput) + " file://$(pwd)/" + datanamemap.get(nextinput));
+					f.println("if [ $? -ne 0 ]; then lcg-cp --vo biomed lfn:" + datanamemap.get(nextinput) + " file://$(pwd)/" + datanamemap.get(nextinput));
+					f.println("fi;");
+					f.println("/bin/sleep 10");
+				}
 			}
 		}
 
