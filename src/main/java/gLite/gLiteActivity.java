@@ -210,9 +210,9 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							System.exit(1);
 						}					
 						// create Grid session
+						
+						session = GridSessionFactory.create(config);	
 						synchronized (session) {
-							session = GridSessionFactory.create(config);	
-
 							//String jobid = submitjob(configurationBean, config, session,proxy);
 							try {
 								// Delegate user proxy to WMProxy server
@@ -244,7 +244,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							}
 							
 							//resubmit if jobid is null
-							if(jobId.equals(null)){
+							if(jobId==null){
 								System.out.println("Resubmitting because jobId is returned as null");
 								continue;
 							}
