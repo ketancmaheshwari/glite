@@ -27,8 +27,6 @@ import net.sf.taverna.t2.workflowmodel.processor.activity.ActivityInputPort;
 import net.sf.taverna.t2.workflowmodel.processor.activity.AsynchronousActivityCallback;
 
 import org.glite.jdl.JobAd;
-import org.globus.gsi.GlobusCredential;
-import org.globus.gsi.GlobusCredentialException;
 
 /**
  * An Activity providing glite functionality. This is the place where the logic
@@ -199,15 +197,10 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							configurationBean.getWMProxy()
 					};
 					config.addWMProxy(vo, configurationBean.getWMProxy());
-					config.addWMProxy(vo, "https://egee-wms-01.cnaf.infn.it:7443/glite_wms_wmproxy_server");
-					config.addWMProxy(vo, "https://grid-wms.desy.de:7443/glite_wms_wmproxy_server");
-					config.addWMProxy(vo, "https://wms01.grid.sinica.edu.tw:7443/glite_wms_wmproxy_server");
-					config.addWMProxy(vo, "https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server");
-					config.addWMProxy(vo, "https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server");
-					config.addWMProxy(vo, "https://wmslb101.grid.ucy.ac.cy:7443/glite_wms_wmproxy_server");
-					config.addWMProxy(vo, "https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server");
 					config.setProxyPath(configurationBean.getProxyPath());
 
+					int wmproxyroundrobincounter=0;
+					
 					jobsubmitloop: while(true){
 						if(retrycount>3){
 							System.out.println("Too many retries done!! Quitting!!!");
@@ -248,7 +241,10 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							//resubmit if jobid is null
 							if(jobId==null){
 								System.out.println("Resubmitting because jobId is returned as null");
-								configurationBean.setWMProxy(wmproxy[2]);
+								if (wmproxyroundrobincounter>=wmproxy.length) wmproxyroundrobincounter=0;
+								config.addWMProxy(vo,wmproxy[wmproxyroundrobincounter]);
+								session = GridSessionFactory.create(config);
+								wmproxyroundrobincounter++;
 								continue;
 							}
 
