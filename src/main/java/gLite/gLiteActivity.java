@@ -187,16 +187,50 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					// path to WMProxy configuration files
 					config.setWMSDir(configurationBean.getWMSDir());
 					String vo=configurationBean.getVO();
+/*						
+						https://wms-lb.ct.infn.it:7443/glite_wms_wmproxy_server
+						https://wms01.lip.pt:7443/glite_wms_wmproxy_server
+						https://graszode.nikhef.nl:7443/glite_wms_wmproxy_server
+						https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server
+						https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server
+						https://wmslb.sdfarm.kr:7443/glite_wms_wmproxy_server
+						
+						https://svr022.gla.scotgrid.ac.uk:7443/glite_wms_wmproxy_server
+						https://wms.pnpi.nw.ru:7443/glite_wms_wmproxy_server
+						
+						https://lcgwms01.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server
+						https://wms.grid.sara.nl:7443/glite_wms_wmproxy_server
+						https://gridit-wms-01.cnaf.infn.it:7443/glite_wms_wmproxy_server
+						https://glite-rb-00.cnaf.infn.it:7443/glite_wms_wmproxy_server
+						
+						https://lcg16.sinp.msu.ru:7443/glite_wms_wmproxy_server
+						https://prod-wms-01.pd.infn.it:7443/glite_wms_wmproxy_server
+						https://wms03.egee-see.org:7443/glite_wms_wmproxy_server
+						
+						https://lapp-wms01.in2p3.fr:7443/glite_wms_wmproxy_server
+						https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server
+						
+						https://agh5.atlas.unimelb.edu.au:7443/glite_wms_wmproxy_server
+*/
 					String[] wmproxy={"https://egee-wms-01.cnaf.infn.it:7443/glite_wms_wmproxy_server",
 							"https://grid-wms.desy.de:7443/glite_wms_wmproxy_server",
+							"https://graspol.nikhef.nl:7443/glite_wms_wmproxy_server",
 							"https://wms01.grid.sinica.edu.tw:7443/glite_wms_wmproxy_server",
 							"https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
 							"https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server",
 							"https://wmslb101.grid.ucy.ac.cy:7443/glite_wms_wmproxy_server",
 							"https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
-							configurationBean.getWMProxy()
+							"https://wms01.grid.sinica.edu.tw:7443/glite_wms_wmproxy_server",
+							"https://wms01.egee-see.org:7443/glite_wms_wmproxy_server",
+							"https://svr023.gla.scotgrid.ac.uk:7443/glite_wms_wmproxy_server",
+							"https://glite-rb.scai.fraunhofer.de:7443/glite_wms_wmproxy_server",
+							"https://grid-wms.ii.edu.mk:7443/glite_wms_wmproxy_server",
+							"https://rb1.cyf-kr.edu.pl:7443/glite_wms_wmproxy_server",
+							"https://g03n06.pdc.kth.se:7443/glite_wms_wmproxy_server"
 					};
 					config.addWMProxy(vo, configurationBean.getWMProxy());
+					config.addWMProxy(vo, "https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server");
+					config.addWMProxy(vo,"https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server");
 					config.setProxyPath(configurationBean.getProxyPath());
 
 					int wmproxyroundrobincounter=0;
@@ -205,7 +239,10 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						if(retrycount>3){
 							System.out.println("Too many retries done!! Quitting!!!");
 							System.exit(1);
-						}					
+						}
+						
+						if (wmproxyroundrobincounter>=wmproxy.length) wmproxyroundrobincounter=0;
+						config.addWMProxy(vo,wmproxy[wmproxyroundrobincounter++]);
 						// create Grid session
 						session = GridSessionFactory.create(config);
 						synchronized (session) {
@@ -241,9 +278,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							//resubmit if jobid is null
 							if(jobId==null){
 								System.out.println("Resubmitting because jobId is returned as null");
-								if (wmproxyroundrobincounter>=wmproxy.length) wmproxyroundrobincounter=0;
-								config.addWMProxy(vo,wmproxy[wmproxyroundrobincounter]);
-								session = GridSessionFactory.create(config);
+			//					session = GridSessionFactory.create(config);
 								wmproxyroundrobincounter++;
 								continue;
 							}
