@@ -38,9 +38,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 	private gLiteActivityConfigurationBean configurationBean;
 	private String outputDir;
 	private static String grid_storage_element;
-	//private static TreeMap<String, String> wfinput;
-	//private static ArrayList<String> wfoutput;
-	//private static HashMap<String, String> datanamemap = new HashMap<String, String>();
 	private static String innerarg;
 
 	@Override
@@ -99,13 +96,11 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 								nextinput = (String) iterator.next();
 								if (getPart(nextinput, 1).equals("file")) {
 									datanamemap.put(nextinput, getRandomString());
-									Runtime.getRuntime().exec("scp /home/ketan/ManchesterWork/gliteworkflows/inputs/" + getPart(nextinput, 2) + " glite.unice.fr:");
+									Runtime.getRuntime().exec("scp " + configurationBean.getJdlconfigbean().getInputsPath()+""+getPart(nextinput, 2)+ " glite.unice.fr:");
 									// Transfer this to grid
 									Runtime.getRuntime().exec("ssh glite.unice.fr lcg-del -a lfn:" + datanamemap.get(nextinput));
 									// upload the data on the grid with a random name
-									Runtime.getRuntime().exec(
-											"ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element + " file://`pwd`/"
-											+ getPart(nextinput, 2));
+									Runtime.getRuntime().exec("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element + " file://`pwd`/"+ getPart(nextinput, 2));
 								} else if (getPart(nextinput, 1).equals("lfn")) {
 									//System.out.println("wfinput is " + getPart(nextinput, 2));
 								}
@@ -212,7 +207,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						
 						https://agh5.atlas.unimelb.edu.au:7443/glite_wms_wmproxy_server
 */
-					String[] wmproxy={"https://egee-wms-01.cnaf.infn.it:7443/glite_wms_wmproxy_server",
+					String[] wmproxy={
 							"https://grid-wms.desy.de:7443/glite_wms_wmproxy_server",
 							"https://graspol.nikhef.nl:7443/glite_wms_wmproxy_server",
 							"https://wms01.grid.sinica.edu.tw:7443/glite_wms_wmproxy_server",
