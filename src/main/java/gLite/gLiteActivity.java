@@ -41,7 +41,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 	private static String innerarg;
 
 	@Override
-	public  void configure(gLiteActivityConfigurationBean configurationBean) throws ActivityConfigurationException {
+	public void configure(gLiteActivityConfigurationBean configurationBean) throws ActivityConfigurationException {
 
 		this.configurationBean = configurationBean;
 		configurePorts(configurationBean);
@@ -86,23 +86,28 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 						}
 					}
 
-					Collection<String> inputportvalues = wfinput.values();	
+					Collection<String> inputportvalues = wfinput.values();
 
 					Map<String, String> datanamemap = new HashMap<String, String>();
 					synchronized (datanamemap) {
 						synchronized (inputportvalues) {
 							for (Iterator<String> iterator = inputportvalues.iterator(); iterator.hasNext();) {
-								// If inputName starts with 'file' transfer it to ui
+								// If inputName starts with 'file' transfer it
+								// to ui
 								nextinput = (String) iterator.next();
 								if (getPart(nextinput, 1).equals("file")) {
 									datanamemap.put(nextinput, getRandomString());
-									Runtime.getRuntime().exec("scp " + configurationBean.getJdlconfigbean().getInputsPath()+""+getPart(nextinput, 2)+ " glite.unice.fr:");
+									Runtime.getRuntime().exec("scp " + configurationBean.getJdlconfigbean().getInputsPath() + "" + getPart(nextinput, 2) + " glite.unice.fr:");
 									// Transfer this to grid
 									Runtime.getRuntime().exec("ssh glite.unice.fr lcg-del -a lfn:" + datanamemap.get(nextinput));
-									// upload the data on the grid with a random name
-									Runtime.getRuntime().exec("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element + " file://`pwd`/"+ getPart(nextinput, 2));
+									// upload the data on the grid with a random
+									// name
+									Runtime.getRuntime().exec(
+											"ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element + " file://`pwd`/"
+											+ getPart(nextinput, 2));
 								} else if (getPart(nextinput, 1).equals("lfn")) {
-									//System.out.println("wfinput is " + getPart(nextinput, 2));
+									// System.out.println("wfinput is " +
+									// getPart(nextinput, 2));
 								}
 							}
 						}
@@ -121,10 +126,10 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 								// TODO
 							}
 
-
 							String wrapperarg = new String();
 
-							// create a string with all input and output ports separated
+							// create a string with all input and output ports
+							// separated
 							// by space
 							try {
 								synchronized (inputportvalues) {
@@ -138,14 +143,14 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 									}
 								}
 								// sort outputport names
-								Collections.sort(wfoutput);	
+								Collections.sort(wfoutput);
 								for (Iterator<String> iterator = wfoutput.iterator(); iterator.hasNext();) {
 									nextinput = (String) iterator.next();
 									if (datanamemap.get(nextinput) != null)
 										wrapperarg = wrapperarg + " " + getPart(datanamemap.get(nextinput), 2);
 								}
 
-								System.out.println("Wrapper arg is  "+configurationBean.getJdlconfigbean().getExecutable() +" "+ wrapperarg);
+								System.out.println("Wrapper arg is  " + configurationBean.getJdlconfigbean().getExecutable() + " " + wrapperarg);
 							} catch (Exception e) {
 								System.err.println("exception in creating args");
 								System.err.println(e.getLocalizedMessage());
@@ -153,24 +158,26 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							innerarg = new String();
 							innerarg = configurationBean.getJdlconfigbean().getJDLArguments();
 							configurationBean.getJdlconfigbean().setWrapperArguments(wrapperarg);
-
-							configurationBean.getJdlconfigbean().setWrapper(createWrapper(configurationBean,wfinput,wfoutput,datanamemap));
+							synchronized (configurationBean) {
+								configurationBean.getJdlconfigbean().setWrapper(createWrapper(configurationBean, wfinput, wfoutput, datanamemap));	
+							}
 							wfoutput.clear();
 							datanamemap.clear();
 						}
 					}
-					configurationBean.setJDLPath(createJDL(configurationBean));
-
+					synchronized (configurationBean) {
+						configurationBean.setJDLPath(createJDL(configurationBean));	
+					}
+					
 					synchronized (wfinput) {
-						wfinput.clear();	
+						wfinput.clear();
 					}
 
+					// /QUOTING FROM HERE TO MAKE IT DUMMY
 
-					///QUOTING FROM HERE TO MAKE IT DUMMY
-
-					GridSessionConfig config=null;
-					GridSession session=null;
-					int retrycount=0;
+					GridSessionConfig config = null;
+					GridSession session = null;
+					int retrycount = 0;
 					long start_time = System.currentTimeMillis();
 
 					config = new GridSessionConfig();
@@ -181,63 +188,62 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					config.setVOMSCertDir(configurationBean.getVOMSCertDir());
 					// path to WMProxy configuration files
 					config.setWMSDir(configurationBean.getWMSDir());
-					String vo=configurationBean.getVO();
-/*						
-						https://wms-lb.ct.infn.it:7443/glite_wms_wmproxy_server
-						https://wms01.lip.pt:7443/glite_wms_wmproxy_server
-						https://graszode.nikhef.nl:7443/glite_wms_wmproxy_server
-						https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server
-						https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server
-						https://wmslb.sdfarm.kr:7443/glite_wms_wmproxy_server
-						
-						https://svr022.gla.scotgrid.ac.uk:7443/glite_wms_wmproxy_server
-						https://wms.pnpi.nw.ru:7443/glite_wms_wmproxy_server
-						
-						https://lcgwms01.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server
-						https://wms.grid.sara.nl:7443/glite_wms_wmproxy_server
-						https://gridit-wms-01.cnaf.infn.it:7443/glite_wms_wmproxy_server
-						https://glite-rb-00.cnaf.infn.it:7443/glite_wms_wmproxy_server
-						
-						https://lcg16.sinp.msu.ru:7443/glite_wms_wmproxy_server
-						https://prod-wms-01.pd.infn.it:7443/glite_wms_wmproxy_server
-						https://wms03.egee-see.org:7443/glite_wms_wmproxy_server
-						
-						https://lapp-wms01.in2p3.fr:7443/glite_wms_wmproxy_server
-						https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server
-						
-						https://agh5.atlas.unimelb.edu.au:7443/glite_wms_wmproxy_server
-*/
-					String[] wmproxy={
-							"https://grid-wms.desy.de:7443/glite_wms_wmproxy_server",
-							"https://graspol.nikhef.nl:7443/glite_wms_wmproxy_server",
-							"https://wms01.grid.sinica.edu.tw:7443/glite_wms_wmproxy_server",
-							"https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
-							"https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server",
-							"https://wmslb101.grid.ucy.ac.cy:7443/glite_wms_wmproxy_server",
-							"https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
-							"https://wms01.grid.sinica.edu.tw:7443/glite_wms_wmproxy_server",
-							"https://wms01.egee-see.org:7443/glite_wms_wmproxy_server",
-							"https://svr023.gla.scotgrid.ac.uk:7443/glite_wms_wmproxy_server",
-							"https://glite-rb.scai.fraunhofer.de:7443/glite_wms_wmproxy_server",
-							"https://grid-wms.ii.edu.mk:7443/glite_wms_wmproxy_server",
-							"https://rb1.cyf-kr.edu.pl:7443/glite_wms_wmproxy_server",
-							"https://g03n06.pdc.kth.se:7443/glite_wms_wmproxy_server"
-					};
+					String vo = configurationBean.getVO();
+					/*
+					 * https://wms-lb.ct.infn.it:7443/glite_wms_wmproxy_server
+					 * https://wms01.lip.pt:7443/glite_wms_wmproxy_server
+					 * https://graszode.nikhef.nl:7443/glite_wms_wmproxy_server
+					 * https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server
+					 * https
+					 * ://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server
+					 * https://wmslb.sdfarm.kr:7443/glite_wms_wmproxy_server
+					 * 
+					 * https://svr022.gla.scotgrid.ac.uk:7443/
+					 * glite_wms_wmproxy_server
+					 * https://wms.pnpi.nw.ru:7443/glite_wms_wmproxy_server
+					 * 
+					 * https://lcgwms01.gridpp.rl.ac.uk:7443/
+					 * glite_wms_wmproxy_server
+					 * https://wms.grid.sara.nl:7443/glite_wms_wmproxy_server
+					 * https
+					 * ://gridit-wms-01.cnaf.infn.it:7443/glite_wms_wmproxy_server
+					 * https
+					 * ://glite-rb-00.cnaf.infn.it:7443/glite_wms_wmproxy_server
+					 * 
+					 * https://lcg16.sinp.msu.ru:7443/glite_wms_wmproxy_server
+					 * https
+					 * ://prod-wms-01.pd.infn.it:7443/glite_wms_wmproxy_server
+					 * https://wms03.egee-see.org:7443/glite_wms_wmproxy_server
+					 * 
+					 * https://lapp-wms01.in2p3.fr:7443/glite_wms_wmproxy_server
+					 * https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server
+					 * 
+					 * https://agh5.atlas.unimelb.edu.au:7443/
+					 * glite_wms_wmproxy_server
+					 */
+					String[] wmproxy = { "https://grid-wms.desy.de:7443/glite_wms_wmproxy_server", "https://graspol.nikhef.nl:7443/glite_wms_wmproxy_server",
+							"https://wms01.grid.sinica.edu.tw:7443/glite_wms_wmproxy_server", "https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
+							"https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server", "https://wmslb101.grid.ucy.ac.cy:7443/glite_wms_wmproxy_server",
+							"https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server", "https://wms01.grid.sinica.edu.tw:7443/glite_wms_wmproxy_server",
+							"https://wms01.egee-see.org:7443/glite_wms_wmproxy_server", "https://svr023.gla.scotgrid.ac.uk:7443/glite_wms_wmproxy_server",
+							"https://glite-rb.scai.fraunhofer.de:7443/glite_wms_wmproxy_server", "https://grid-wms.ii.edu.mk:7443/glite_wms_wmproxy_server",
+							"https://rb1.cyf-kr.edu.pl:7443/glite_wms_wmproxy_server", "https://g03n06.pdc.kth.se:7443/glite_wms_wmproxy_server" };
 					config.addWMProxy(vo, configurationBean.getWMProxy());
 					config.addWMProxy(vo, "https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server");
-					config.addWMProxy(vo,"https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server");
+					config.addWMProxy(vo, "https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server");
 					config.setProxyPath(configurationBean.getProxyPath());
 
-					int wmproxyroundrobincounter=0;
-					
-					jobsubmitloop: while(true){
-						if(retrycount>3){
+					int wmproxyroundrobincounter = 0;
+
+					jobsubmitloop: while (true) {
+						if (retrycount > 3) {
 							System.out.println("Too many retries done!! Quitting!!!");
 							System.exit(1);
 						}
-						
-						if (wmproxyroundrobincounter>=wmproxy.length) wmproxyroundrobincounter=0;
-						config.addWMProxy(vo,wmproxy[wmproxyroundrobincounter++]);
+
+						if (wmproxyroundrobincounter >= wmproxy.length)
+							wmproxyroundrobincounter = 0;
+						config.addWMProxy(vo, wmproxy[wmproxyroundrobincounter++]);
 						// create Grid session
 						session = GridSessionFactory.create(config);
 						synchronized (session) {
@@ -259,81 +265,76 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
-
-							String jdl = jad.toString();
-
+							String jdl = new String("");
+							synchronized (jdl) {
+							jdl = jad.toString();
 							// Submit job to grid
-
 							try {
-								jobId = session.submitJob(jdl,configurationBean.getJdlconfigbean().getInputsPath());
+								jobId = session.submitJob(jdl, configurationBean.getJdlconfigbean().getInputsPath());
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
-
-							//resubmit if jobid is null
-							if(jobId==null){
+							}
+							
+							// resubmit if jobid is null
+							if (jobId == null) {
 								System.out.println("Resubmitting because jobId is returned as null");
-			//					session = GridSessionFactory.create(config);
 								wmproxyroundrobincounter++;
 								continue;
 							}
 
-
-							System.out.println("Started job with Id : " + jobId + " (" + configurationBean.getJdlconfigbean().getExecutable()+") ");
+							System.out.println("Started job with Id : " + jobId + " (" + configurationBean.getJdlconfigbean().getExecutable() + ") ");
 						}
 						// Monitor job status
 						String jobState = "";
-						boolean flaginwaiting=false;
-						boolean flaginscheduled=false;
-						boolean flaginready=false;
-						long start_time_in_waiting_state=System.currentTimeMillis();
-						long start_time_in_scheduled_state=System.currentTimeMillis();
-						long start_time_in_ready_state=System.currentTimeMillis();
+						boolean flaginwaiting = false;
+						boolean flaginscheduled = false;
+						boolean flaginready = false;
+						long start_time_in_waiting_state = System.currentTimeMillis();
+						long start_time_in_scheduled_state = System.currentTimeMillis();
+						long start_time_in_ready_state = System.currentTimeMillis();
 
 						do {
 							Thread.sleep(Long.parseLong(configurationBean.getPollFrequency()));
 							jobState = session.getJobState(jobId);
 
-							if (jobState.equals("WAITING")&&!flaginwaiting){
-								start_time_in_waiting_state=System.currentTimeMillis();
-								flaginwaiting=true;
+							if (jobState.equals("WAITING") && !flaginwaiting) {
+								start_time_in_waiting_state = System.currentTimeMillis();
+								flaginwaiting = true;
 							}
 
-							if (jobState.equals("READY")&&!flaginready){
-								start_time_in_ready_state=System.currentTimeMillis();
-								flaginready=true;
+							if (jobState.equals("READY") && !flaginready) {
+								start_time_in_ready_state = System.currentTimeMillis();
+								flaginready = true;
 							}
 
-							if (jobState.equals("SCHEDULED")&&!flaginscheduled){
-								start_time_in_waiting_state=System.currentTimeMillis();
-								flaginscheduled=true;
+							if (jobState.equals("SCHEDULED") && !flaginscheduled) {
+								start_time_in_waiting_state = System.currentTimeMillis();
+								flaginscheduled = true;
 							}
 
-							if(((System.currentTimeMillis()-start_time_in_waiting_state>=900000)&&jobState.equals("WAITING"))){
+							if (((System.currentTimeMillis() - start_time_in_waiting_state >= 900000) && jobState.equals("WAITING"))) {
 								System.out.println("Resubmitting because taking too much time in WAITING state");
 								retrycount++;
-								session.cancelJob(jobId);
 								continue jobsubmitloop;
 							}
-							if(((System.currentTimeMillis()-start_time_in_ready_state>=900000)&&jobState.equals("SCHEDULED"))){
+							if (((System.currentTimeMillis() - start_time_in_ready_state >= 900000) && jobState.equals("SCHEDULED"))) {
 								System.out.println("Resubmitting because taking too much time in SCHEDULED state");
 								retrycount++;
-								session.cancelJob(jobId);
 								continue jobsubmitloop;
 							}
-							if(((System.currentTimeMillis()-start_time_in_scheduled_state>=900000)&&jobState.equals("SCHEDULED"))){
+							if (((System.currentTimeMillis() - start_time_in_scheduled_state >= 900000) && jobState.equals("SCHEDULED"))) {
 								System.out.println("Resubmitting because taking too much time in SCHEDULED state");
 								retrycount++;
-								session.cancelJob(jobId);
 								continue jobsubmitloop;
 							}
 							System.out.println("Job status: " + configurationBean.getJdlconfigbean().getExecutable() + " : " + jobState);
 						} while (!jobState.equals("DONE") && !jobState.equals("ABORTED"));
 
-						if(jobState.equals("ABORTED")){
+						if (jobState.equals("ABORTED")) {
 							System.out.println("Resubmitting because aborted");
 							retrycount++;
-							continue ;
+							continue;
 						}
 
 						// Download job output
@@ -349,7 +350,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					long elapsed_time = (end_time - start_time) / 1000;
 					System.out.println("The Job took " + elapsed_time + " seconds to complete.");
 
-					//QUOTE UNTIL HERE TO MAKE IT DUMMY
+					// QUOTE UNTIL HERE TO MAKE IT DUMMY
 
 					// send result to the callback
 					callback.receiveResult(outputData, new int[0]);
@@ -382,7 +383,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		});
 	}
 
-	public static String createJDL(gLiteActivityConfigurationBean glb) throws IOException {
+	private static String createJDL(gLiteActivityConfigurationBean glb) throws IOException {
 
 		File jdlfile = new File("/tmp/", System.currentTimeMillis() + ".jdl");
 		PrintWriter f = new PrintWriter(new FileWriter(jdlfile));
@@ -408,7 +409,8 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		return jdlfile.getAbsolutePath();
 	}
 
-	public static String createWrapper(gLiteActivityConfigurationBean glb, TreeMap<String, String> wfinput, ArrayList<String> wfoutput, Map<String, String> datanamemap) throws IOException {
+	private static String createWrapper(gLiteActivityConfigurationBean glb, TreeMap<String, String> wfinput, ArrayList<String> wfoutput, Map<String, String> datanamemap)
+	throws IOException {
 
 		File wrapperfile = new File(glb.getJdlconfigbean().getInputsPath(), "wrapper_" + System.currentTimeMillis() + ".sh");
 		PrintWriter f = new PrintWriter(new FileWriter(wrapperfile));
@@ -462,14 +464,14 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		f.println("DATA_TRANSFER_TO_GRID_START=`date +%s`");
 
 		f.println("#Treating output ports ...");
-		//for (int i = 0; i < wfoutput.size(); i++) {
+		// for (int i = 0; i < wfoutput.size(); i++) {
 		for (Iterator<String> iterator = wfoutput.iterator(); iterator.hasNext();) {
 			nextinput = (String) iterator.next();
 			f.println("#" + getPart(datanamemap.get(nextinput), 1) + " " + getPart(datanamemap.get(nextinput), 2));
 			f.println("lcg-cr --vo biomed -l lfn:" + getPart(datanamemap.get(nextinput), 2) + " -d " + grid_storage_element + " file://$(pwd)/"
 					+ getPart(datanamemap.get(nextinput), 2));
 			f.println("if [ $? -ne 0 ]; then lcg-cr --vo biomed -l lfn:" + getPart(datanamemap.get(nextinput), 2) + " -d " + grid_storage_element + " file://$(pwd)/"
-					+ getPart(datanamemap.get(nextinput),2));
+					+ getPart(datanamemap.get(nextinput), 2));
 			f.println("fi;");
 			f.println("/bin/sleep 5");
 		}
