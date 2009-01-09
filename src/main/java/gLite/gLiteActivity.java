@@ -156,9 +156,11 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 								System.err.println(e.getLocalizedMessage());
 							}
 							innerarg = new String();
-							innerarg = configurationBean.getJdlconfigbean().getJDLArguments();
-							configurationBean.getJdlconfigbean().setWrapperArguments(wrapperarg);
+							synchronized (innerarg) {
+								innerarg = configurationBean.getJdlconfigbean().getJDLArguments();	
+							}
 							synchronized (configurationBean) {
+								configurationBean.getJdlconfigbean().setWrapperArguments(wrapperarg);
 								configurationBean.getJdlconfigbean().setWrapper(createWrapper(configurationBean, wfinput, wfoutput, datanamemap));	
 							}
 							wfoutput.clear();
@@ -168,7 +170,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					synchronized (configurationBean) {
 						configurationBean.setJDLPath(createJDL(configurationBean));	
 					}
-					
 					synchronized (wfinput) {
 						wfinput.clear();
 					}
