@@ -97,13 +97,14 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 								nextinput = (String) iterator.next();
 								if (getPart(nextinput, 1).equals("file")) {
 									datanamemap.put(nextinput, getRandomString());
+									System.out.println("scp " + configurationBean.getJdlconfigbean().getInputsPath() + "" + getPart(nextinput, 2) + " glite.unice.fr:");
 									Runtime.getRuntime().exec("scp " + configurationBean.getJdlconfigbean().getInputsPath() + "" + getPart(nextinput, 2) + " glite.unice.fr:");
 									// Transfer this to grid
-									Runtime.getRuntime().exec("ssh glite.unice.fr lcg-del -a lfn:" + datanamemap.get(nextinput));
 									// upload the data on the grid with a random
 									// name
-									Runtime.getRuntime().exec(
-											"ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element + " file://`pwd`/"
+									System.out.println("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element + " file://`pwd`/"
+											+ getPart(nextinput, 2));
+									Runtime.getRuntime().exec("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element + " file://`pwd`/"
 											+ getPart(nextinput, 2));
 								} else if (getPart(nextinput, 1).equals("lfn")) {
 									// System.out.println("wfinput is " +
@@ -230,8 +231,6 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							"https://glite-rb.scai.fraunhofer.de:7443/glite_wms_wmproxy_server", "https://grid-wms.ii.edu.mk:7443/glite_wms_wmproxy_server",
 							"https://rb1.cyf-kr.edu.pl:7443/glite_wms_wmproxy_server", "https://g03n06.pdc.kth.se:7443/glite_wms_wmproxy_server" };
 					config.addWMProxy(vo, configurationBean.getWMProxy());
-					config.addWMProxy(vo, "https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server");
-					config.addWMProxy(vo, "https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server");
 					config.setProxyPath(configurationBean.getProxyPath());
 
 					int wmproxyroundrobincounter = 0;
