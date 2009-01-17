@@ -84,19 +84,21 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					synchronized (datanamemap) {
 						synchronized (inputportvalues) {
 							for (Iterator<String> iterator = inputportvalues.iterator(); iterator.hasNext();) {
-								// If inputName starts with 'file' transfer it to ui
+								// If inputName starts with 'file' transfer it
+								// to ui
 								nextinput = (String) iterator.next();
 								if (getPart(nextinput, 1).equals("file")) {
 									datanamemap.put(nextinput, getRandomString());
 									System.out.println("scp " + configurationBean.getJdlconfigbean().getInputsPath() + "" + getPart(nextinput, 2) + " glite.unice.fr:");
 									Runtime.getRuntime().exec("scp " + configurationBean.getJdlconfigbean().getInputsPath() + "" + getPart(nextinput, 2) + " glite.unice.fr:");
 									// Transfer this to grid
-									// upload the data on the grid with a random name
+									// upload the data on the grid with a random
+									// name
 									System.out.println("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element
 											+ " file://`pwd`/" + getPart(nextinput, 2));
 									Runtime.getRuntime().exec(
 											"ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element + " file://`pwd`/"
-													+ getPart(nextinput, 2));
+											+ getPart(nextinput, 2));
 								}
 							}
 						}
@@ -115,7 +117,8 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 								// TODO
 							}
 							String wrapperarg = new String();
-							// create a string with all input and output ports separated by space
+							// create a string with all input and output ports
+							// separated by space
 							try {
 								synchronized (inputportvalues) {
 									for (Iterator<String> iterator = inputportvalues.iterator(); iterator.hasNext();) {
@@ -166,143 +169,149 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					long start_time = System.currentTimeMillis();
 
 					config = new GridSessionConfig();
-					// path to CA certificates
-					config.setCADir(configurationBean.getCaDir());
-					// paths to VOMS configuration files and certificates
-					config.setVOMSDir(configurationBean.getVOMSDir());
-					config.setVOMSCertDir(configurationBean.getVOMSCertDir());
-					// path to WMProxy configuration files
-					config.setWMSDir(configurationBean.getWMSDir());
-					String vo = configurationBean.getVO();
-					String[] wmproxy = {
-							"https://grid-wms.desy.de:7443/glite_wms_wmproxy_server", "https://graspol.nikhef.nl:7443/glite_wms_wmproxy_server",
-							"https://wms01.grid.sinica.edu.tw:7443/glite_wms_wmproxy_server", "https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
-							"https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server", "https://wmslb101.grid.ucy.ac.cy:7443/glite_wms_wmproxy_server",
-							"https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server", "https://wms01.grid.sinica.edu.tw:7443/glite_wms_wmproxy_server",
-							"https://wms01.egee-see.org:7443/glite_wms_wmproxy_server", "https://svr023.gla.scotgrid.ac.uk:7443/glite_wms_wmproxy_server",
-							"https://glite-rb.scai.fraunhofer.de:7443/glite_wms_wmproxy_server", "https://grid-wms.ii.edu.mk:7443/glite_wms_wmproxy_server",
-							"https://rb1.cyf-kr.edu.pl:7443/glite_wms_wmproxy_server", "https://g03n06.pdc.kth.se:7443/glite_wms_wmproxy_server" };
-					boolean proxyassigned=true;
-					config.addWMProxy(vo, configurationBean.getWMProxy());
-					config.setProxyPath(configurationBean.getProxyPath());
+					synchronized (config) {
+						// path to CA certificates
+						config.setCADir(configurationBean.getCaDir());
+						// paths to VOMS configuration files and certificates
+						config.setVOMSDir(configurationBean.getVOMSDir());
+						config.setVOMSCertDir(configurationBean.getVOMSCertDir());
+						// path to WMProxy configuration files
+						config.setWMSDir(configurationBean.getWMSDir());
+						String vo = configurationBean.getVO();
+						String[] wmproxy = { "https://grid-wms.desy.de:7443/glite_wms_wmproxy_server", "https://graspol.nikhef.nl:7443/glite_wms_wmproxy_server",
+								"https://wms01.grid.sinica.edu.tw:7443/glite_wms_wmproxy_server", "https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
+								"https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server", "https://wmslb101.grid.ucy.ac.cy:7443/glite_wms_wmproxy_server",
+								"https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server", "https://wms01.grid.sinica.edu.tw:7443/glite_wms_wmproxy_server",
+								"https://wms01.egee-see.org:7443/glite_wms_wmproxy_server", "https://svr023.gla.scotgrid.ac.uk:7443/glite_wms_wmproxy_server",
+								"https://glite-rb.scai.fraunhofer.de:7443/glite_wms_wmproxy_server", "https://grid-wms.ii.edu.mk:7443/glite_wms_wmproxy_server",
+								"https://rb1.cyf-kr.edu.pl:7443/glite_wms_wmproxy_server", "https://g03n06.pdc.kth.se:7443/glite_wms_wmproxy_server" };
+						boolean proxyassigned = true;
+						config.addWMProxy(vo, configurationBean.getWMProxy());
+						config.setProxyPath(configurationBean.getProxyPath());
 
-					int wmproxyroundrobincounter = 0;
+						int wmproxyroundrobincounter = 0;
 
-					jobsubmitloop: while (true) {
-						if (retrycount > 3) {
-							System.out.println("Too many retries done!! Quitting!!!");
-							System.exit(1);
-						}
-
-						if (wmproxyroundrobincounter >= wmproxy.length) wmproxyroundrobincounter = 0;
-						if(!proxyassigned){
-							config.addWMProxy(vo, wmproxy[wmproxyroundrobincounter++]);
-							proxyassigned=true;
-						}
-						// create Grid session
-						session = GridSessionFactory.create(config);
-						synchronized (session) {
-							try {
-								// Delegate user proxy to WMProxy server
-								session.delegateProxy(configurationBean.getDelegationID());
-							} catch (GridAPIException e) {
-								e.printStackTrace();
+						jobsubmitloop: while (true) {
+							if (retrycount > 3) {
+								System.out.println("Too many retries done!! Quitting!!!");
+								System.exit(1);
 							}
-						}
 
-						// Load job description
-						JobAd jad = new JobAd();
-						String jobId = null;
-						synchronized (jad) {
+							if (wmproxyroundrobincounter >= wmproxy.length)
+								wmproxyroundrobincounter = 0;
 
-							try {
-								jad.fromFile(configurationBean.getJDLPath());
-							} catch (Exception e) {
-								e.printStackTrace();
+							if (!proxyassigned) {
+								config.addWMProxy(vo, wmproxy[wmproxyroundrobincounter++]);
+								proxyassigned = true;
 							}
-							String jdl = new String("");
-							synchronized (jdl) {
-								jdl = jad.toString();
-								// Submit job to grid
+
+							// create Grid session
+							session = GridSessionFactory.create(config);
+							synchronized (session) {
 								try {
-									jobId = session.submitJob(jdl, configurationBean.getJdlconfigbean().getInputsPath());
-								} catch (Exception e) {
+									// Delegate user proxy to WMProxy server
+									session.delegateProxy(configurationBean.getDelegationID());
+								} catch (GridAPIException e) {
 									e.printStackTrace();
 								}
 							}
 
-							// resubmit if jobid is null
-							if (jobId == null) {
-								System.out.println("Resubmitting because jobId is returned as null");
-								wmproxyroundrobincounter++;
+							// Load job description
+							JobAd jad = new JobAd();
+							String jobId = null;
+
+							synchronized (jad) {
+
+								try {
+									jad.fromFile(configurationBean.getJDLPath());
+								} catch (Exception e) {
+									e.printStackTrace();
+								}
+
+								String jdl = new String("");
+								synchronized (jdl) {
+									jdl = jad.toString();
+									// Submit job to grid
+									try {
+										jobId = session.submitJob(jdl, configurationBean.getJdlconfigbean().getInputsPath());
+									} catch (Exception e) {
+										e.printStackTrace();
+									}
+								}
+
+								// resubmit if jobid is null
+								if (jobId == null) {
+									System.out.println("Resubmitting because jobId is returned as null");
+									wmproxyroundrobincounter++;
+									proxyassigned = false;
+									continue;
+								}
+								System.out.println("Started job with Id : " + jobId + " (" + configurationBean.getJdlconfigbean().getExecutable() + ") ");
+							}
+							// Monitor job status
+							String jobState = "";
+							boolean flaginwaiting = false;
+							boolean flaginscheduled = false;
+							boolean flaginready = false;
+							long start_time_in_waiting_state = System.currentTimeMillis();
+							long start_time_in_scheduled_state = System.currentTimeMillis();
+							long start_time_in_ready_state = System.currentTimeMillis();
+							do {
+								Thread.sleep(Long.parseLong(configurationBean.getPollFrequency()));
+								jobState = session.getJobState(jobId);
+
+								if (jobState.equals("WAITING") && !flaginwaiting) {
+									start_time_in_waiting_state = System.currentTimeMillis();
+									flaginwaiting = true;
+								}
+
+								if (jobState.equals("READY") && !flaginready) {
+									start_time_in_ready_state = System.currentTimeMillis();
+									flaginready = true;
+								}
+
+								if (jobState.equals("SCHEDULED") && !flaginscheduled) {
+									start_time_in_waiting_state = System.currentTimeMillis();
+									flaginscheduled = true;
+								}
+
+								if (((System.currentTimeMillis() - start_time_in_waiting_state >= 900000) && jobState.equals("WAITING"))) {
+									System.out.println("Resubmitting because taking too much time in WAITING state");
+									retrycount++;
+									proxyassigned = false;
+									continue jobsubmitloop;
+								}
+								if (((System.currentTimeMillis() - start_time_in_ready_state >= 900000) && jobState.equals("SCHEDULED"))) {
+									System.out.println("Resubmitting because taking too much time in SCHEDULED state");
+									retrycount++;
+									proxyassigned = false;
+									continue jobsubmitloop;
+								}
+								if (((System.currentTimeMillis() - start_time_in_scheduled_state >= 900000) && jobState.equals("SCHEDULED"))) {
+									System.out.println("Resubmitting because taking too much time in SCHEDULED state");
+									retrycount++;
+									proxyassigned = false;
+									continue jobsubmitloop;
+								}
+								System.out.println("Job status: " + configurationBean.getJdlconfigbean().getExecutable() + " : " + jobState);
+							} while (!jobState.equals("DONE") && !jobState.equals("ABORTED"));
+
+							if (jobState.equals("ABORTED")) {
+								System.out.println("Resubmitting because aborted");
+								retrycount++;
+								proxyassigned = false;
 								continue;
 							}
-							System.out.println("Started job with Id : " + jobId + " (" + configurationBean.getJdlconfigbean().getExecutable() + ") ");
-						}
-						// Monitor job status
-						String jobState = "";
-						boolean flaginwaiting = false;
-						boolean flaginscheduled = false;
-						boolean flaginready = false;
-						long start_time_in_waiting_state = System.currentTimeMillis();
-						long start_time_in_scheduled_state = System.currentTimeMillis();
-						long start_time_in_ready_state = System.currentTimeMillis();
-						do {
-							Thread.sleep(Long.parseLong(configurationBean.getPollFrequency()));
-							jobState = session.getJobState(jobId);
 
-							if (jobState.equals("WAITING") && !flaginwaiting) {
-								start_time_in_waiting_state = System.currentTimeMillis();
-								flaginwaiting = true;
+							// Download job output
+							if (jobState.equals("DONE")) {
+								outputDir = configurationBean.getOutputPath() + Util.getShortJobId(jobId);
+								session.getJobOutput(jobId, outputDir);
+								System.out.println("Job output is downloaded to: " + outputDir);
+								break;
 							}
-
-							if (jobState.equals("READY") && !flaginready) {
-								start_time_in_ready_state = System.currentTimeMillis();
-								flaginready = true;
-							}
-
-							if (jobState.equals("SCHEDULED") && !flaginscheduled) {
-								start_time_in_waiting_state = System.currentTimeMillis();
-								flaginscheduled = true;
-							}
-
-							if (((System.currentTimeMillis() - start_time_in_waiting_state >= 900000) && jobState.equals("WAITING"))) {
-								System.out.println("Resubmitting because taking too much time in WAITING state");
-								retrycount++;
-								proxyassigned=false;
-								continue jobsubmitloop;
-							}
-							if (((System.currentTimeMillis() - start_time_in_ready_state >= 900000) && jobState.equals("SCHEDULED"))) {
-								System.out.println("Resubmitting because taking too much time in SCHEDULED state");
-								retrycount++;
-								proxyassigned=false;
-								continue jobsubmitloop;
-							}
-							if (((System.currentTimeMillis() - start_time_in_scheduled_state >= 900000) && jobState.equals("SCHEDULED"))) {
-								System.out.println("Resubmitting because taking too much time in SCHEDULED state");
-								retrycount++;
-								proxyassigned=false;
-								continue jobsubmitloop;
-							}
-							System.out.println("Job status: " + configurationBean.getJdlconfigbean().getExecutable() + " : " + jobState);
-						} while (!jobState.equals("DONE") && !jobState.equals("ABORTED"));
-
-						if (jobState.equals("ABORTED")) {
-							System.out.println("Resubmitting because aborted");
-							retrycount++;
-							proxyassigned=false;
-							continue;
-						}
-
-						// Download job output
-						if (jobState.equals("DONE")) {
-							outputDir = configurationBean.getOutputPath() + Util.getShortJobId(jobId);
-							session.getJobOutput(jobId, outputDir);
-							System.out.println("Job output is downloaded to: " + outputDir);
-							break;
 						}
 					}
-
 					long end_time = System.currentTimeMillis();
 					long elapsed_time = (end_time - start_time) / 1000;
 					System.out.println("The Job took " + elapsed_time + " seconds to complete.");
@@ -367,7 +376,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 	}
 
 	private static String createWrapper(gLiteActivityConfigurationBean glb, TreeMap<String, String> wfinput, ArrayList<String> wfoutput, Map<String, String> datanamemap)
-			throws IOException {
+	throws IOException {
 
 		File wrapperfile = new File(glb.getJdlconfigbean().getInputsPath(), "wrapper_" + System.currentTimeMillis() + ".sh");
 		PrintWriter f = new PrintWriter(new FileWriter(wrapperfile));
