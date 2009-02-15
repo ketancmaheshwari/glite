@@ -184,35 +184,36 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					config = new GridSessionConfig();
 					synchronized (config) {
 						// path to CA certificates
-						config.setCADir(configurationBean.getCaDir());
+						config.setCertDir(configurationBean.getCaDir());
 						// paths to VOMS configuration files and certificates
 						config.setVOMSDir(configurationBean.getVOMSDir());
 						config.setVOMSCertDir(configurationBean.getVOMSCertDir());
 						// path to WMProxy configuration files
 						config.setWMSDir(configurationBean.getWMSDir());
 						String vo = configurationBean.getVO();
-						String[] wmproxy = { "https://grid-wms.desy.de:7443/glite_wms_wmproxy_server", "https://wms01.grid.sinica.edu.tw:7443/glite_wms_wmproxy_server",
-								"https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
+						String[] wmproxy = {"https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
 								"https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server", "https://wmslb101.grid.ucy.ac.cy:7443/glite_wms_wmproxy_server",
 								"https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server", "https://wms01.grid.sinica.edu.tw:7443/glite_wms_wmproxy_server",
 								"https://wms01.egee-see.org:7443/glite_wms_wmproxy_server", "https://svr023.gla.scotgrid.ac.uk:7443/glite_wms_wmproxy_server",
 								"https://glite-rb.scai.fraunhofer.de:7443/glite_wms_wmproxy_server", "https://grid-wms.ii.edu.mk:7443/glite_wms_wmproxy_server",
-								"https://rb1.cyf-kr.edu.pl:7443/glite_wms_wmproxy_server", "https://g03n06.pdc.kth.se:7443/glite_wms_wmproxy_server" };
+								"https://rb1.cyf-kr.edu.pl:7443/glite_wms_wmproxy_server"};
 						boolean proxyassigned = true;
-						config.addWMProxy(vo, configurationBean.getWMProxy());
 						config.setProxyPath(configurationBean.getProxyPath());
-
+						
 						int wmproxyroundrobincounter = 0;
-
+						
+						config.addWMProxy(vo, wmproxy[wmproxyroundrobincounter]);
+						
 						jobsubmitloop: while (true) {
-							if (retrycount > 3) {
+							Thread.sleep(5000);
+							if (retrycount > 4) {
 								System.out.println("Too many retries done!! Quitting!!!");
 								System.exit(1);
 							}
-
-							if (wmproxyroundrobincounter >= wmproxy.length)
-								wmproxyroundrobincounter = 0;
-
+							
+							wmproxyroundrobincounter++;
+							if (wmproxyroundrobincounter>=wmproxy.length)
+								wmproxyroundrobincounter=0;
 							if (!proxyassigned) {
 								config.addWMProxy(vo, wmproxy[wmproxyroundrobincounter]);
 								proxyassigned = true;
@@ -223,7 +224,9 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							synchronized (session) {
 								try {
 									// Delegate user proxy to WMProxy server
-									session.delegateProxy(configurationBean.getDelegationID());
+							//		System.out.println("Delegation ID is "+ configurationBean.getDelegationID());
+									session.delegateProxy(getRandomString());
+								//	session.delegateProxy(vo,configurationBean.getDelegationID());
 								} catch (GridAPIException e) {
 									e.printStackTrace();
 								}
@@ -254,8 +257,10 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 
 								// resubmit if jobid is null
 								if (jobId.equals("none")) {
-									System.out.println("Resubmitting because jobId is returned as null");
-									wmproxyroundrobincounter++;
+									System.out.println("Resubmitting: jobId is returned as null "+ config.getWMProxies().get("biomed"));
+									System.out.println("jdl is "+jdl);
+									System.out.println("inputspath is "+ configurationBean.getJdlconfigbean().getInputsPath());
+									System.out.println("jobid is "+jobId);
 									proxyassigned = false;
 									continue;
 								}
@@ -272,7 +277,14 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 							do {
 								Thread.sleep(Long.parseLong(configurationBean.getPollFrequency()));
 								synchronized (jobState) {
-									jobState = session.getJobState(jobId);
+									try {
+										jobState = session.getJobState(jobId);	
+									} catch (Exception e) {
+										// TODO: handle exception
+										System.err.println("Number Format Exception");
+										continue jobsubmitloop;
+									}
+									
 								}
 
 								if (jobState.equals("WAITING") && !flaginwaiting) {
@@ -293,31 +305,27 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 								if (((System.currentTimeMillis() - start_time_in_waiting_state >= 900000) && jobState.equals("WAITING"))) {
 									System.out.println("Resubmitting because taking too much time in WAITING state");
 									retrycount++;
-									wmproxyroundrobincounter++;
 									proxyassigned = false;
 									continue jobsubmitloop;
 								}
 								if (((System.currentTimeMillis() - start_time_in_ready_state >= 900000) && jobState.equals("SCHEDULED"))) {
 									System.out.println("Resubmitting because taking too much time in SCHEDULED state");
 									retrycount++;
-									wmproxyroundrobincounter++;
 									proxyassigned = false;
 									continue jobsubmitloop;
 								}
 								if (((System.currentTimeMillis() - start_time_in_scheduled_state >= 900000) && jobState.equals("SCHEDULED"))) {
 									System.out.println("Resubmitting because taking too much time in SCHEDULED state");
 									retrycount++;
-									wmproxyroundrobincounter++;
 									proxyassigned = false;
 									continue jobsubmitloop;
 								}
-								System.out.println("Job status: " + configurationBean.getJdlconfigbean().getExecutable() + " : " + jobState);
+								System.out.println("Job status: " + configurationBean.getJdlconfigbean().getExecutable() +" ( "+jobId+" ) : " + jobState);
 							} while (!jobState.equals("DONE") && !jobState.equals("ABORTED"));
 
 							if (jobState.equals("ABORTED")) {
 								System.out.println("Resubmitting because aborted");
-								retrycount++;
-								wmproxyroundrobincounter++;
+								//retrycount++;
 								proxyassigned = false;
 								continue;
 							}
@@ -328,7 +336,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 								synchronized (outputDir) {
 									DateFormat df = DateFormat.getInstance();
 									outputDir = configurationBean.getOutputPath() + Util.getShortJobId(jobId);
-									session.getJobOutput(jobId, outputDir);
+									session.getJobOutput(jobId, outputDir,true);
 									System.out.println("Job output is downloaded to: " + outputDir + " at "+df.format(new Date()));
 								}
 								break;
@@ -395,6 +403,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		f.println("InputSandbox={" + glb.getJdlconfigbean().getInputSandbox() + ",\"" + wrappername + "\"};");
 		f.println("OutputSandbox={" + glb.getJdlconfigbean().getOutputSandbox() + "};");
 		f.println("RetryCount=" + glb.getJdlconfigbean().getRetryCount() + ";");
+		f.println("ShallowRetryCount=3;");
 		f.println("Requirements=" + glb.getJdlconfigbean().getRequirements() + ";");
 		f.println("Rank=(-other.GlueCEStateEstimatedResponseTime);");
 		f.println();
@@ -412,6 +421,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 		f.println("#!/bin/bash");
 		// f.println("/bin/sleep 10");
 		f.println("echo $*");
+		f.println("/bin/hostname");
 		f.println("export LFC_HOME=lfc-biomed.in2p3.fr:/grid/biomed/testKetan");
 		f.println();
 		f.println("#Read the starting time");
