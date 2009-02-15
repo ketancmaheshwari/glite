@@ -81,13 +81,13 @@
    
     <dependency>
     <groupId>glite</groupId>
-    <artifactId>classad</artifactId>
+    <artifactId>classad-2.4</artifactId>
     <version>1</version>
     </dependency>
   
    <dependency>
    <groupId>glite</groupId>
-   <artifactId>cog-jglobus</artifactId>
+   <artifactId>cog-jglobus-1.6.0</artifactId>
    <version>1</version>
    </dependency>
 
@@ -166,7 +166,7 @@
   
    <dependency>
    <groupId>glite</groupId>
-   <artifactId>bcprov-jdk14-122</artifactId>
+   <artifactId>bcprov-jdk15-141</artifactId>
    <version>1</version>
    </dependency>
   
