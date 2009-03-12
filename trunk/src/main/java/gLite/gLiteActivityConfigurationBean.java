@@ -15,7 +15,8 @@ public class gLiteActivityConfigurationBean extends ActivityPortsDefinitionBean 
 	private String VOMSDir;
 	private String VOMSCertDir;
 	private String ProxyPath;
-	private String DelegationID;
+	//private String DelegationID;
+	private String UI;
 	private String WMSDir;
 	private String JDLPath;
 	private String OutputPath;
@@ -100,13 +101,13 @@ public class gLiteActivityConfigurationBean extends ActivityPortsDefinitionBean 
 		ProxyPath = proxyPath;
 	}
 
-	public String getDelegationID() {
-		return DelegationID;
-	}
+//	public String getDelegationID() {
+	//	return DelegationID;
+	//}
 
-	public void setDelegationID(String delegationID) {
-		DelegationID = delegationID;
-	}
+	//public void setDelegationID(String delegationID) {
+	//	DelegationID = delegationID;
+	//}
 
 	public String getPollFrequency() {
 		return PollFrequency;
@@ -130,6 +131,14 @@ public class gLiteActivityConfigurationBean extends ActivityPortsDefinitionBean 
 
 	public void setSE(String SE) {
 		this.SE=SE;
+	}
+
+	public String getUI() {
+		return UI;
+	}
+
+	public void setUI(String UI) {
+		this.UI = UI;
 	}
 
 

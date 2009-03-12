@@ -66,7 +66,7 @@ public class gLiteActivityItem extends AbstractActivityItem{
 		//bean.setWMProxy("https://wms01.egee-see.org:7443/glite_wms_wmproxy_server");
 		//bean.setWMProxy("https://lcgrb02.jinr.ru:7443/glite_wms_wmproxy_server");
 		bean.setWMProxy("https://egee-wms-01.cnaf.infn.it:7443/glite_wms_wmproxy_server");
-		bean.setDelegationID("501");
+		bean.setUI("glite.unice.fr");
 		bean.setCaDir("/etc/grid-security/certificates");
 		bean.setProxyPath("/tmp/x509up_u501");
 		bean.setVOMSDir("/home/ketan/glite-ui/glite/etc/vomses");
