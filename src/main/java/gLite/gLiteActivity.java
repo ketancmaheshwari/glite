@@ -1,5 +1,4 @@
 package gLite;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -40,7 +39,8 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 	private static Object input;
 	private gLiteActivityConfigurationBean configurationBean;
 	private static String grid_storage_element;
-
+	private static String ui;
+	
 	@Override
 	public void configure(gLiteActivityConfigurationBean configurationBean) throws ActivityConfigurationException {
 
@@ -74,21 +74,29 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 				ReferenceService referenceService = callback.getContext().getReferenceService();
 				Map<String, T2Reference> outputData = new HashMap<String, T2Reference>();
 				TreeMap<String, String> wfinput = new TreeMap<String, String>();
+				
 				try {
 					String nextinput;
 					grid_storage_element = configurationBean.getSE();
+					ui = configurationBean.getUI();
+					Collection<String> inputportvalues;
+					
 					synchronized (wfinput) {
 						for (String inputName : data.keySet()) {
 							ActivityInputPort inputPort = getInputPort(inputName);
 							inputName = sanatisePortName(inputName);
 							input = referenceService.renderIdentifier(data.get(inputName), inputPort.getTranslatedElementClass(), callback.getContext());
+							System.out.println("DEBUG: inputname "+input.toString());
 							wfinput.put(inputName, input.toString());
 						}
+						inputportvalues = wfinput.values();
 					}
-					Collection<String> inputportvalues = wfinput.values();
+					
 					Map<String, String> datanamemap = new HashMap<String, String>();
+					
 					synchronized (inputportvalues) {
 						synchronized (datanamemap) {
+							
 							for (Iterator<String> iterator = inputportvalues.iterator(); iterator.hasNext();) {
 								// If inputName starts with 'file' transfer it
 								// to ui
@@ -96,15 +104,14 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 								if (getPart(nextinput, 1).equals("file")) {
 									datanamemap.put(nextinput, getRandomString());
 									//Runtime.getRuntime().exec("scp " + configurationBean.getJdlconfigbean().getInputsPath() + "" + getPart(nextinput, 2) + " glite.unice.fr:");
-									ProcessBuilder pb1 = new ProcessBuilder("bash", "-c", "scp " + configurationBean.getJdlconfigbean().getInputsPath() + "" + getPart(nextinput, 2) + " glite.unice.fr:");
+									ProcessBuilder pb1 = new ProcessBuilder("bash", "-c", "scp " + configurationBean.getJdlconfigbean().getInputsPath() + "" + getPart(nextinput, 2) + " "+ui+":");
 									Process p1=pb1.start();
 									int exitval1=p1.waitFor();
 									System.out.println("Exit value for scp is "+exitval1);
 									
 									// Transfer this to grid upload the data on the grid with a random name
-									//Runtime.getRuntime().exec("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element + " file://`pwd`/"+ getPart(nextinput, 2));
-									System.out.println("ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element + " file://`pwd`/"+ getPart(nextinput, 2));
-									ProcessBuilder pb2 = new ProcessBuilder("bash", "-c","ssh glite.unice.fr lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element + " file:///home/ketan/"+ getPart(nextinput, 2));
+									System.out.println("ssh "+ui+" lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element + " file:///home/ketan/"+ getPart(nextinput, 2));
+									ProcessBuilder pb2 = new ProcessBuilder("bash", "-c","ssh "+ui+" lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + grid_storage_element + " file:///home/ketan/"+ getPart(nextinput, 2));
 									Process p2=pb2.start();
 									int exitval2=p2.waitFor();
 									System.out.println("Exit value for lcg-cr is "+exitval2);

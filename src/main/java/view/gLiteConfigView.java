@@ -194,7 +194,7 @@ public class gLiteConfigView extends JPanel {
 		jLabelVOMSDir = new javax.swing.JLabel();
 		jLabelVOMSCertDir = new javax.swing.JLabel();
 		jLabelProxyPath = new javax.swing.JLabel();
-		jLabelDelegationID = new javax.swing.JLabel();
+		jLabelUI = new javax.swing.JLabel();
 		jLabelWMProxyURL = new javax.swing.JLabel();
 		jLabelWMSDir = new javax.swing.JLabel();
 		jLabelOutputPath = new javax.swing.JLabel();
@@ -206,7 +206,7 @@ public class gLiteConfigView extends JPanel {
 		jTextFieldVOMSDir = new javax.swing.JTextField();
 		jTextFieldVOMSCertDir = new javax.swing.JTextField();
 		jTextFieldProxyPath = new javax.swing.JTextField();
-		jTextFieldDelegationID = new javax.swing.JTextField();
+		jTextFieldUI = new javax.swing.JTextField();
 		jTextFieldProxyURL = new javax.swing.JTextField();
 		jTextFieldWMSDir = new javax.swing.JTextField();
 		jTextFieldOutputPath = new javax.swing.JTextField();
@@ -223,7 +223,7 @@ public class gLiteConfigView extends JPanel {
 
 		jLabelProxyPath.setText("ProxyPath");
 
-		jLabelDelegationID.setText("DelegationID");
+		jLabelUI.setText("UI");
 
 		jLabelWMProxyURL.setText("WMProxyURL");
 
@@ -253,8 +253,8 @@ public class gLiteConfigView extends JPanel {
 		jTextFieldProxyPath.setColumns(30);
 		jTextFieldProxyPath.setToolTipText("Path of the proxy certificate");
 
-		jTextFieldDelegationID.setColumns(30);
-		jTextFieldDelegationID.setToolTipText("Can be any number");
+		jTextFieldUI.setColumns(30);
+		jTextFieldUI.setToolTipText("Can be any number");
 
 		jTextFieldProxyURL.setColumns(30);
 		jTextFieldProxyURL.setToolTipText("WMProxy endpoint URL");
@@ -321,13 +321,13 @@ public class gLiteConfigView extends JPanel {
 			}
 		});
 
-		jTextFieldDelegationID.setText(configuration.getDelegationID());
-		jTextFieldDelegationID.addFocusListener(new FocusListener() {
+		jTextFieldUI.setText(configuration.getUI());
+		jTextFieldUI.addFocusListener(new FocusListener() {
 			public void focusGained(FocusEvent e) {
 			}
 
 			public void focusLost(FocusEvent e) {
-				configuration.setDelegationID(jTextFieldDelegationID.getText());
+				configuration.setUI(jTextFieldUI.getText());
 			}
 		});
 
@@ -390,8 +390,8 @@ public class gLiteConfigView extends JPanel {
 								layout.createSequentialGroup().addGroup(
 										layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING).addComponent(jLabelWMProxyURL).addComponent(jLabelProxyPath)
 												.addComponent(jLabelVOMSCertDir).addComponent(jLabelVOMSDir).addComponent(jLabelCADir).addComponent(jLabelVO).addComponent(
-														jLabelDelegationID)).addGap(38, 38, 38).addGroup(
-										layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(jTextFieldDelegationID,
+														jLabelUI)).addGap(38, 38, 38).addGroup(
+										layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addComponent(jTextFieldUI,
 												javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE,
 												javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jTextFieldVO, javax.swing.GroupLayout.Alignment.TRAILING,
 												javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(
@@ -420,7 +420,7 @@ public class gLiteConfigView extends JPanel {
 												layout.createSequentialGroup().addGap(38, 38, 38).addComponent(jTextFieldSE, javax.swing.GroupLayout.PREFERRED_SIZE,
 														javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))).addContainerGap()));
 
-		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] { jTextFieldCADir, jTextFieldDelegationID, jTextFieldProxyPath, jTextFieldVO,
+		layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] { jTextFieldCADir, jTextFieldUI, jTextFieldProxyPath, jTextFieldVO,
 				jTextFieldVOMSCertDir });
 
 		layout.setVerticalGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING).addGroup(
@@ -440,8 +440,8 @@ public class gLiteConfigView extends JPanel {
 						layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jTextFieldProxyPath, javax.swing.GroupLayout.PREFERRED_SIZE,
 								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabelProxyPath)).addPreferredGap(
 						javax.swing.LayoutStyle.ComponentPlacement.RELATED).addGroup(
-						layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jTextFieldDelegationID, javax.swing.GroupLayout.PREFERRED_SIZE,
-								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabelDelegationID)).addPreferredGap(
+						layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jTextFieldUI, javax.swing.GroupLayout.PREFERRED_SIZE,
+								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabelUI)).addPreferredGap(
 						javax.swing.LayoutStyle.ComponentPlacement.RELATED).addGroup(
 						layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE).addComponent(jTextFieldProxyURL, javax.swing.GroupLayout.PREFERRED_SIZE,
 								javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabelWMProxyURL)).addPreferredGap(
@@ -459,7 +459,7 @@ public class gLiteConfigView extends JPanel {
 												javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE).addComponent(jLabelSE))).addComponent(
 								jLabelPollFrequency)).addContainerGap(34, Short.MAX_VALUE)));
 
-		layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] { jTextFieldCADir, jTextFieldDelegationID, jTextFieldProxyPath, jTextFieldVO,
+		layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] { jTextFieldCADir, jTextFieldUI, jTextFieldProxyPath, jTextFieldVO,
 				jTextFieldVOMSCertDir });
 
 		return propertiesPanel;
@@ -1142,7 +1142,7 @@ public class gLiteConfigView extends JPanel {
 
 				gliteActivityConfigurationBean.setVO(jTextFieldVO.getText());
 				gliteActivityConfigurationBean.setCaDir(jTextFieldCADir.getText());
-				gliteActivityConfigurationBean.setDelegationID(jTextFieldDelegationID.getText());
+				gliteActivityConfigurationBean.setUI(jTextFieldUI.getText());
 				gliteActivityConfigurationBean.setProxyPath(jTextFieldProxyPath.getText());
 				gliteActivityConfigurationBean.setWMProxy(jTextFieldProxyURL.getText());
 				gliteActivityConfigurationBean.setVOMSDir(jTextFieldVOMSDir.getText());
@@ -1172,7 +1172,7 @@ public class gLiteConfigView extends JPanel {
 	private javax.swing.JLabel jLabelVOMSDir;
 	private javax.swing.JLabel jLabelVOMSCertDir;
 	private javax.swing.JLabel jLabelProxyPath;
-	private javax.swing.JLabel jLabelDelegationID;
+	private javax.swing.JLabel jLabelUI;
 	private javax.swing.JLabel jLabelWMProxyURL;
 	private javax.swing.JLabel jLabelWMSDir;
 	private javax.swing.JLabel jLabelOutputPath;
@@ -1180,7 +1180,7 @@ public class gLiteConfigView extends JPanel {
 	private javax.swing.JLabel jLabelSE;
 
 	private javax.swing.JTextField jTextFieldCADir;
-	private javax.swing.JTextField jTextFieldDelegationID;
+	private javax.swing.JTextField jTextFieldUI;
 	private javax.swing.JTextField jTextFieldProxyPath;
 	private javax.swing.JTextField jTextFieldProxyURL;
 	private javax.swing.JTextField jTextFieldVO;
