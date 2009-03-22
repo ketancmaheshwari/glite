@@ -3,7 +3,6 @@ package gLite;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,7 +27,7 @@ import view.gLiteConfigView;
  * Unit tests for gliteActivity.
  * 
  */
-public class gLiteActivityTest {
+public class gLiteActivityTest{
 
 	private gLiteActivity activity;
 
@@ -103,7 +102,7 @@ public class gLiteActivityTest {
 		//assertTrue(outputs.containsKey("example_output"));
 		//assertEquals("hello_example", outputs.get("example_output"));
 	}
-
+	
 	@Test
 	public void testConfiguregliteActivityConfigurationBean() throws Exception {
 		Set<String> expectedInputs = new HashSet<String>();
