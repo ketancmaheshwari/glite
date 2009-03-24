@@ -68,15 +68,13 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 				
 				//generate the names of outputports and provide to the glitexecutor
 				for (OutputPort outputPort : getOutputPorts()) {
-					System.out.println("processing outputport "+ outputPort.getName());
 					Object value="lfn:" + getRandomString();
 					glitexecutor.setOutParams(outputPort,value);
 					
 				}
 				
 				// run
-				String status=glitexecutor.execute(configurationBean);
-				System.out.println("job Status is "+ status);
+				glitexecutor.execute(configurationBean);
 				
 				// register outputs
 				for (OutputPort outputPort : getOutputPorts()) {
@@ -91,11 +89,10 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					// TODO
 				}
 				// send result to the callback
-				System.out.println("About to callback!!");
 				callback.receiveResult(outputData, new int[0]);
 			} catch (ReferenceServiceException e) {
 				callback.fail(
-						"Error accessing beanshell input/output data for " + this, e);
+						"Error " + this, e);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
