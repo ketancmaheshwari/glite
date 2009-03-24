@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Random;
 import java.util.TreeMap;
 
 import net.sf.taverna.t2.workflowmodel.OutputPort;
@@ -31,7 +32,7 @@ public class gLitExecutor {
 	private String nextinput;
 	private Map<String, String> datanamemap;
 	private String wrapperarg;
-
+	private static Random rand=new Random();
 	
 	
 	public gLitExecutor() {
@@ -128,20 +129,20 @@ public class gLitExecutor {
 		// path to WMProxy configuration files
 		config.setWMSDir(configurationBean.getWMSDir());
 		String vo = configurationBean.getVO();
-		String[] wmproxy = { "https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server", "https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server",
+		String[] wmproxy = { "https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server",
 				"https://wmslb101.grid.ucy.ac.cy:7443/glite_wms_wmproxy_server", "https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
 				"https://wms01.grid.sinica.edu.tw:7443/glite_wms_wmproxy_server", "https://wms01.egee-see.org:7443/glite_wms_wmproxy_server",
 				"https://svr023.gla.scotgrid.ac.uk:7443/glite_wms_wmproxy_server", "https://glite-rb.scai.fraunhofer.de:7443/glite_wms_wmproxy_server",
-				"https://grid-wms.ii.edu.mk:7443/glite_wms_wmproxy_server", "https://rb1.cyf-kr.edu.pl:7443/glite_wms_wmproxy_server" };
+				"https://grid-wms.ii.edu.mk:7443/glite_wms_wmproxy_server", "https://rb1.cyf-kr.edu.pl:7443/glite_wms_wmproxy_server","https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server" };
 		boolean proxyassigned = true;
 		config.setProxyPath(configurationBean.getProxyPath());
 
 		int wmproxyroundrobincounter = 0;
-
-		config.addWMProxy(vo, wmproxy[wmproxyroundrobincounter]);
+		String currproxy=wmproxy[rand.nextInt(wmproxy.length)];
+		System.out.println("Currently used proxy is "+ currproxy);
+		config.addWMProxy(vo, currproxy);
 
 		jobsubmitloop: while (true) {
-			Thread.sleep(5000);
 			if (retrycount > 4) {
 				System.out.println("Too many retries done!! Quitting!!!");
 				System.exit(1);
@@ -160,6 +161,7 @@ public class gLitExecutor {
 				try {
 					// Delegate user proxy to WMProxy server
 					session.delegateProxy(getRandomString());
+					//session.delegateProxy("501");
 				} catch (GridAPIException e) {
 					e.printStackTrace();
 				}
@@ -169,7 +171,7 @@ public class gLitExecutor {
 
 			String innerarg = configurationBean.getJdlconfigbean().getJDLArguments();
 			String wrappername = createWrapper(configurationBean, wfinput, wfoutput, datanamemap, innerarg);
-			
+			wrapperarg="";
 			wrapperarg=createWrapperArg();
 			System.out.println("Wrapper Arg is: "+wrapperarg);
 			String JDLPath = createJDL(configurationBean, wrappername, wrapperarg);
