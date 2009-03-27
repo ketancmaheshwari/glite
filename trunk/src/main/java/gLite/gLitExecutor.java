@@ -43,20 +43,6 @@ public class gLitExecutor {
 		wrapperarg=new String();
 	}
 
-	/*public String postprocess(ArrayList<String> wfout, gLiteActivityConfigurationBean glb) {
-		// sort outputport names
-		Collections.sort(wfout);
-		String wrapperarg = null;
-		for (Iterator<String> iterator = wfout.iterator(); iterator.hasNext();) {
-			nextinput = (String) iterator.next();
-			if (datanamemap.get(nextinput) != null)
-				wrapperarg += " " + getPart(datanamemap.get(nextinput), 2);
-		}
-		System.out.println("Execution String is  " + glb.getJdlconfigbean().getExecutable() + " " + wrapperarg);
-
-		return "blah";
-	}*/
-
 	public void setOutParams(OutputPort outputPort, Object value) {
 		wfoutput.add(outputPort.getName());
 		datanamemap.put(outputPort.getName(), (String) value);
@@ -75,6 +61,8 @@ public class gLitExecutor {
 			nextinput = (String) iterator.next();
 			if (getPart(nextinput, 1).equals("file")) {
 				datanamemap.put(nextinput, getRandomString());
+				System.out.println("scp " + configurationBean.getJdlconfigbean().getInputsPath() + "" + getPart(nextinput, 2) + " "
+						+ configurationBean.getUI() + ":");
 				ProcessBuilder pb1 = new ProcessBuilder("bash", "-c", "scp " + configurationBean.getJdlconfigbean().getInputsPath() + "" + getPart(nextinput, 2) + " "
 						+ configurationBean.getUI() + ":");
 				Process p1 = pb1.start();
@@ -95,12 +83,14 @@ public class gLitExecutor {
 
 	private String createWrapperArg() {
 		// create a string with all input and output ports separated by space
-		
+		inputportvalues=wfinput.values();
 		for (Iterator<Object> iterator = inputportvalues.iterator(); iterator.hasNext();) {
 			nextinput = (String) iterator.next();
 			if (getPart(nextinput, 1).equals("lfn")) {
 				wrapperarg+=" " + getPart(nextinput, 2);
-			} else if (datanamemap.get(nextinput) != null) {
+				//System.out.println("lfn");
+			} else if (getPart(nextinput,1).equals("file")) {
+				//System.out.println("file");
 				wrapperarg+=" " + datanamemap.get(nextinput);
 			}
 		}
@@ -129,11 +119,48 @@ public class gLitExecutor {
 		// path to WMProxy configuration files
 		config.setWMSDir(configurationBean.getWMSDir());
 		String vo = configurationBean.getVO();
-		String[] wmproxy = { "https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server",
-				"https://wmslb101.grid.ucy.ac.cy:7443/glite_wms_wmproxy_server", "https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
-				"https://wms01.grid.sinica.edu.tw:7443/glite_wms_wmproxy_server", "https://wms01.egee-see.org:7443/glite_wms_wmproxy_server",
-				"https://svr023.gla.scotgrid.ac.uk:7443/glite_wms_wmproxy_server", "https://glite-rb.scai.fraunhofer.de:7443/glite_wms_wmproxy_server",
-				"https://grid-wms.ii.edu.mk:7443/glite_wms_wmproxy_server", "https://rb1.cyf-kr.edu.pl:7443/glite_wms_wmproxy_server","https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server" };
+		//"https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server","https://rb1.cyf-kr.edu.pl:7443/glite_wms_wmproxy_server",
+		String[] wmproxy = { 
+				"https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
+				"https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
+				"https://graspol.nikhef.nl:7443/glite_wms_wmproxy_server",
+					"https://grid-wms.ii.edu.mk:7443/glite_wms_wmproxy_server",
+					"https://glite-rb-00.cnaf.infn.it:7443/glite_wms_wmproxy_server",
+					"https://lcgrb02.jinr.ru:7443/glite_wms_wmproxy_server",
+					"https://gridit-wms-01.cnaf.infn.it:7443/glite_wms_wmproxy_server",
+					"https://grid-wms15.desy.de:7443/glite_wms_wmproxy_server",
+					"https://wmslb101.grid.ucy.ac.cy:7443/glite_wms_wmproxy_server",
+					"https://lcgwms02.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server",
+					"https://lcgrb01.jinr.ru:7443/glite_wms_wmproxy_server",
+					"https://wms01.egee-see.org:7443/glite_wms_wmproxy_server",
+					"https://grid-wms1.desy.de:7443/glite_wms_wmproxy_server",
+					"https://grid-wms10.desy.de:7443/glite_wms_wmproxy_server",
+					"https://grid-wms14.desy.de:7443/glite_wms_wmproxy_server",
+					"https://graszode.nikhef.nl:7443/glite_wms_wmproxy_server",
+					"https://prod-wms-01.pd.infn.it:7443/glite_wms_wmproxy_server",
+					"https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
+					"https://wmslb.sdfarm.kr:7443/glite_wms_wmproxy_server",
+					"https://svr023.gla.scotgrid.ac.uk:7443/glite_wms_wmproxy_server",
+					"https://svr022.gla.scotgrid.ac.uk:7443/glite_wms_wmproxy_server",
+					"https://glite-rb.scai.fraunhofer.de:7443/glite_wms_wmproxy_server",
+					"https://wms.pnpi.nw.ru:7443/glite_wms_wmproxy_server",
+					"https://grid-wms5.desy.de:7443/glite_wms_wmproxy_server",
+					"https://wms00.hep.ph.ic.ac.uk:7443/glite_wms_wmproxy_server",
+					"https://grid-wms2.desy.de:7443/glite_wms_wmproxy_server",
+					"https://wms.grid.sara.nl:7443/glite_wms_wmproxy_server",
+					"https://egee-wms-01.cnaf.infn.it:7443/glite_wms_wmproxy_server",
+					"https://wms03.egee-see.org:7443/glite_wms_wmproxy_server",
+					"https://lcgwms03.gridpp.rl.ac.uk:7443/glite_wms_wmproxy_server",
+					"https://grid-wms12.desy.de:7443/glite_wms_wmproxy_server",
+					"https://lapp-wms01.in2p3.fr:7443/glite_wms_wmproxy_server",
+					"https://lcg16.sinp.msu.ru:7443/glite_wms_wmproxy_server",
+					"https://wms01.lip.pt:7443/glite_wms_wmproxy_server",
+					"https://grid-wms11.desy.de:7443/glite_wms_wmproxy_server",
+					"https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
+					"https://rb1.cyf-kr.edu.pl:7443/glite_wms_wmproxy_server",
+					"https://agh5.atlas.unimelb.edu.au:7443/glite_wms_wmproxy_server",
+					"https://grid-wms13.desy.de:7443/glite_wms_wmproxy_server"
+				};
 		boolean proxyassigned = true;
 		config.setProxyPath(configurationBean.getProxyPath());
 
@@ -164,6 +191,7 @@ public class gLitExecutor {
 					//session.delegateProxy("501");
 				} catch (GridAPIException e) {
 					e.printStackTrace();
+					continue;
 				}
 			// Load job description
 			JobAd jad = new JobAd();
@@ -209,7 +237,7 @@ public class gLitExecutor {
 					System.err.println("Number Format Exception");
 					continue jobsubmitloop;
 				}
-
+			
 				if (jobState.equals("WAITING") && !flaginwaiting) {
 					start_time_in_waiting_state = System.currentTimeMillis();
 					flaginwaiting = true;
