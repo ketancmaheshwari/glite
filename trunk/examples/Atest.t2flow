@@ -1,0 +1,73 @@
+<workflow xmlns="http://taverna.sf.net/2008/xml/t2flow" version="1"><dataflow id="e01879f8-4a68-4ef0-a44e-5cec1d455d35" role="top"><name>dataflow0</name><inputPorts><port><name>in1</name><depth>0</depth><granularDepth>0</granularDepth></port><port><name>in2</name><depth>0</depth><granularDepth>0</granularDepth></port><port><name>in3</name><depth>0</depth><granularDepth>0</granularDepth></port></inputPorts><outputPorts><port><name>out1</name></port><port><name>out2</name></port><port><name>out3</name></port></outputPorts><processors><processor><name>gLite</name><inputPorts><port><name>datain</name><depth>0</depth></port><port><name>newInputPort0</name><depth>0</depth></port><port><name>newInputPort1</name><depth>0</depth></port></inputPorts><outputPorts><port><name>dataout</name><depth>0</depth><granularDepth>0</granularDepth></port><port><name>newOutput0</name><depth>0</depth><granularDepth>0</granularDepth></port><port><name>newOutput1</name><depth>0</depth><granularDepth>0</granularDepth></port></outputPorts><annotations /><activities><activity><raven><group>glite</group><artifact>glite</artifact><version>1.0-SNAPSHOT</version></raven><class>gLite.gLiteActivity</class><inputMap><map from="newInputPort0" to="newInputPort0" /><map from="datain" to="datain" /><map from="newInputPort1" to="newInputPort1" /></inputMap><outputMap><map from="newOutput1" to="newOutput1" /><map from="newOutput0" to="newOutput0" /><map from="dataout" to="dataout" /></outputMap><configBean encoding="xstream"><gLite.gLiteActivityConfigurationBean xmlns="">
+  <WMProxy>https://egee-wms-01.cnaf.infn.it:7443/glite_wms_wmproxy_server</WMProxy>
+  <VO>biomed</VO>
+  <CaDir>/etc/grid-security/certificates</CaDir>
+  <VOMSDir>/home/ketan/glite-ui/glite/etc/vomses</VOMSDir>
+  <VOMSCertDir>/etc/grid-security/vomsdir/</VOMSCertDir>
+  <ProxyPath>/tmp/x509up_u501</ProxyPath>
+  <DelegationID>501</DelegationID>
+  <WMSDir>/home/ketan/glite-ui/glite/etc/wms/biomed</WMSDir>
+  <OutputPath>/tmp/</OutputPath>
+  <PollFrequency>20000</PollFrequency>
+  <jdlconfigbean>
+    <Type>Job</Type>
+    <JobType>Normal</JobType>
+    <Executable>/bin/echo</Executable>
+    <StdOut>stdout</StdOut>
+    <StdErr>stderr</StdErr>
+    <InputSandbox>"blah.txt"</InputSandbox>
+    <OutputSandbox>"stdout","stderr"</OutputSandbox>
+    <Arguments>$1</Arguments>
+    <NodeNumber>0</NodeNumber>
+    <InputsPath>/home/ketan/ManchesterWork/gliteworkflows/inputs/</InputsPath>
+    <Requirements>(other.GlueCEStateStatus == "Production") &amp;&amp; RegExp("nl",other.GlueCEUniqueId)</Requirements>
+    <RetryCount>3</RetryCount>
+  </jdlconfigbean>
+  <inputs>
+    <net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+      <handledReferenceSchemes />
+      <translatedElementType>java.lang.String</translatedElementType>
+      <allowsLiteralValues>true</allowsLiteralValues>
+      <name>newInputPort0</name>
+      <depth>0</depth>
+      <mimeTypes>
+        <string>text/plain</string>
+      </mimeTypes>
+    </net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+    <net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+      <handledReferenceSchemes />
+      <translatedElementType>java.lang.String</translatedElementType>
+      <allowsLiteralValues>true</allowsLiteralValues>
+      <name>newInputPort1</name>
+      <depth>0</depth>
+      <mimeTypes>
+        <string>text/plain</string>
+      </mimeTypes>
+    </net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityInputPortDefinitionBean>
+  </inputs>
+  <outputs>
+    <net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean>
+      <granularDepth>0</granularDepth>
+      <name>newOutput0</name>
+      <depth>0</depth>
+      <mimeTypes>
+        <string>text/plain</string>
+      </mimeTypes>
+    </net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean>
+    <net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean>
+      <granularDepth>0</granularDepth>
+      <name>newOutput1</name>
+      <depth>0</depth>
+      <mimeTypes>
+        <string>text/plain</string>
+      </mimeTypes>
+    </net.sf.taverna.t2.workflowmodel.processor.activity.config.ActivityOutputPortDefinitionBean>
+  </outputs>
+</gLite.gLiteActivityConfigurationBean></configBean></activity></activities><dispatchStack><dispatchLayer><raven><group>net.sf.taverna.t2</group><artifact>workflowmodel-impl</artifact><version>0.3</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Parallelize</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig xmlns="">
+  <maxJobs>5</maxJobs>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ParallelizeConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2</group><artifact>workflowmodel-impl</artifact><version>0.3</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.ErrorBounce</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2</group><artifact>workflowmodel-impl</artifact><version>0.3</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Failover</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2</group><artifact>workflowmodel-impl</artifact><version>0.3</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Retry</class><configBean encoding="xstream"><net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig xmlns="">
+  <backoffFactor>1.0</backoffFactor>
+  <initialDelay>1000</initialDelay>
+  <maxDelay>5000</maxDelay>
+  <maxRetries>3</maxRetries>
+</net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.RetryConfig></configBean></dispatchLayer><dispatchLayer><raven><group>net.sf.taverna.t2</group><artifact>workflowmodel-impl</artifact><version>0.3</version></raven><class>net.sf.taverna.t2.workflowmodel.processor.dispatch.layers.Invoke</class><configBean encoding="xstream"><null xmlns="" /></configBean></dispatchLayer></dispatchStack><iterationStrategyStack><iteration><strategy><cross><port name="datain" depth="0" /><port name="newInputPort0" depth="0" /><port name="newInputPort1" depth="0" /></cross></strategy></iteration></iterationStrategyStack></processor></processors><conditions /><datalinks><datalink><sink type="processor"><processor>gLite</processor><port>datain</port></sink><source type="dataflow"><port>in1</port></source></datalink><datalink><sink type="processor"><processor>gLite</processor><port>newInputPort0</port></sink><source type="dataflow"><port>in2</port></source></datalink><datalink><sink type="processor"><processor>gLite</processor><port>newInputPort1</port></sink><source type="dataflow"><port>in3</port></source></datalink><datalink><sink type="dataflow"><port>out1</port></sink><source type="processor"><processor>gLite</processor><port>dataout</port></source></datalink><datalink><sink type="dataflow"><port>out2</port></sink><source type="processor"><processor>gLite</processor><port>newOutput0</port></source></datalink><datalink><sink type="dataflow"><port>out3</port></sink><source type="processor"><processor>gLite</processor><port>newOutput1</port></source></datalink></datalinks></dataflow></workflow>
