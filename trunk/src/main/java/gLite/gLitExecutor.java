@@ -125,7 +125,7 @@ public class gLitExecutor {
 				"https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
 				"https://graspol.nikhef.nl:7443/glite_wms_wmproxy_server",
 					"https://grid-wms.ii.edu.mk:7443/glite_wms_wmproxy_server",
-					"https://glite-rb-00.cnaf.infn.it:7443/glite_wms_wmproxy_server",
+					/*"https://glite-rb-00.cnaf.infn.it:7443/glite_wms_wmproxy_server",*/
 					"https://lcgrb02.jinr.ru:7443/glite_wms_wmproxy_server",
 					"https://gridit-wms-01.cnaf.infn.it:7443/glite_wms_wmproxy_server",
 					"https://grid-wms15.desy.de:7443/glite_wms_wmproxy_server",
@@ -139,10 +139,10 @@ public class gLitExecutor {
 					"https://graszode.nikhef.nl:7443/glite_wms_wmproxy_server",
 					"https://prod-wms-01.pd.infn.it:7443/glite_wms_wmproxy_server",
 					"https://grid25.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
-					"https://wmslb.sdfarm.kr:7443/glite_wms_wmproxy_server",
+					/*"https://wmslb.sdfarm.kr:7443/glite_wms_wmproxy_server",*/
 					"https://svr023.gla.scotgrid.ac.uk:7443/glite_wms_wmproxy_server",
 					"https://svr022.gla.scotgrid.ac.uk:7443/glite_wms_wmproxy_server",
-					"https://glite-rb.scai.fraunhofer.de:7443/glite_wms_wmproxy_server",
+					/*"https://glite-rb.scai.fraunhofer.de:7443/glite_wms_wmproxy_server",*/
 					"https://wms.pnpi.nw.ru:7443/glite_wms_wmproxy_server",
 					"https://grid-wms5.desy.de:7443/glite_wms_wmproxy_server",
 					"https://wms00.hep.ph.ic.ac.uk:7443/glite_wms_wmproxy_server",
@@ -157,7 +157,7 @@ public class gLitExecutor {
 					"https://wms01.lip.pt:7443/glite_wms_wmproxy_server",
 					"https://grid-wms11.desy.de:7443/glite_wms_wmproxy_server",
 					"https://grid07.lal.in2p3.fr:7443/glite_wms_wmproxy_server",
-					"https://rb1.cyf-kr.edu.pl:7443/glite_wms_wmproxy_server",
+					/*"https://rb1.cyf-kr.edu.pl:7443/glite_wms_wmproxy_server",*/
 					"https://agh5.atlas.unimelb.edu.au:7443/glite_wms_wmproxy_server",
 					"https://grid-wms13.desy.de:7443/glite_wms_wmproxy_server"
 				};
@@ -179,7 +179,7 @@ public class gLitExecutor {
 			if (wmproxyroundrobincounter >= wmproxy.length)
 				wmproxyroundrobincounter = 0;
 			if (!proxyassigned) {
-				config.addWMProxy(vo, wmproxy[wmproxyroundrobincounter]);
+				config.addWMProxy(vo, wmproxy[rand.nextInt(wmproxy.length)]);
 				proxyassigned = true;
 			}
 
@@ -190,7 +190,9 @@ public class gLitExecutor {
 					session.delegateProxy(getRandomString());
 					//session.delegateProxy("501");
 				} catch (GridAPIException e) {
-					e.printStackTrace();
+					System.err.println(e.getMessage());
+					System.err.println("The offending wms is : "+ currproxy);
+					proxyassigned=false;
 					continue;
 				}
 			// Load job description
@@ -235,6 +237,7 @@ public class gLitExecutor {
 				} catch (Exception e) {
 					// TODO: handle exception
 					System.err.println("Number Format Exception");
+					proxyassigned=false;
 					continue jobsubmitloop;
 				}
 			
@@ -271,7 +274,7 @@ public class gLitExecutor {
 					proxyassigned = false;
 					continue jobsubmitloop;
 				}
-				System.out.println("Job status: " + configurationBean.getJdlconfigbean().getExecutable() + " ( " + jobId + " ) : " + jobState);
+				System.out.println("Job status: "+ jobId +" "+ configurationBean.getJdlconfigbean().getExecutable() + ":" + jobState);
 			} while (!jobState.equals("DONE") && !jobState.equals("ABORTED"));
 
 			if (jobState.equals("ABORTED")) {
@@ -286,7 +289,7 @@ public class gLitExecutor {
 			if (jobState.equals("DONE")) {
 				DateFormat df = DateFormat.getInstance();
 				outputDir = configurationBean.getOutputPath() + Util.getShortJobId(jobId);
-				session.getJobOutput(jobId, outputDir, true);
+				session.getJobOutput(jobId, outputDir,false);
 				System.out.println("Job output is downloaded to: " + outputDir + " at " + df.format(new Date()));
 			}
 			break;
