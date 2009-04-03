@@ -61,6 +61,17 @@ public class gLitExecutor {
 			nextinput = (String) iterator.next();
 			if (getPart(nextinput, 1).equals("file")) {
 				datanamemap.put(nextinput, getRandomString());
+				if(configurationBean.getUI().equals("localhost")){
+					System.out.println("==Data transfer from Localhost==");
+					System.out.println("lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d " + configurationBean.getSE()
+							+ " file://($pwd)" + getPart(nextinput, 2));
+					ProcessBuilder pb = new ProcessBuilder("bash", "-c", " lcg-cr --vo biomed -l lfn:" + datanamemap.get(nextinput) + " -d "
+							+ configurationBean.getSE() + " file://($pwd)" + getPart(nextinput, 2));
+					Process p2 = pb.start();
+					int exitval2 = p2.waitFor();
+					System.out.println("Exit value for lcg-cr is " + exitval2);
+					
+				}else{
 				System.out.println("scp " + configurationBean.getJdlconfigbean().getInputsPath() + "" + getPart(nextinput, 2) + " "
 						+ configurationBean.getUI() + ":");
 				ProcessBuilder pb1 = new ProcessBuilder("bash", "-c", "scp " + configurationBean.getJdlconfigbean().getInputsPath() + "" + getPart(nextinput, 2) + " "
@@ -76,6 +87,9 @@ public class gLitExecutor {
 				Process p2 = pb2.start();
 				int exitval2 = p2.waitFor();
 				System.out.println("Exit value for lcg-cr is " + exitval2);
+				p1.destroy();
+				p2.destroy();
+				}
 			}
 		}
 
@@ -307,10 +321,12 @@ public class gLitExecutor {
 		File wrapperfile = new File(glb.getJdlconfigbean().getInputsPath(), "wrapper_" + System.currentTimeMillis() + ".sh");
 		PrintWriter f = new PrintWriter(new FileWriter(wrapperfile));
 		f.println("#!/bin/bash");
-		// f.println("/bin/sleep 10");
 		f.println("echo $*");
 		f.println("/bin/hostname");
-		f.println("export LFC_HOME=lfc-biomed.in2p3.fr:/grid/biomed/testKetan");
+		if(glb.getUI().equals("egee1.unice.fr"))
+			f.println("export LFC_HOME=lfc-biomed.in2p3.fr:/grid/biomed/testKetan2");
+		else
+			f.println("export LFC_HOME=lfc-biomed.in2p3.fr:/grid/biomed/testKetan");
 		f.println();
 		f.println("#Read the starting time");
 		f.println("DATA_TRANSFER_FROM_GRID_START=`date +%s`");
