@@ -427,7 +427,10 @@ public class gLitExecutor {
 		f.println("StdError=\"" + glb.getJdlconfigbean().getStdErr() + "\";");
 		// f.println("InputSandbox={" + glb.getJdlconfigbean().getInputSandbox()
 		// + ",\"" + glb.getJdlconfigbean().getWrapper() + "\"};");
-		f.println("InputSandbox={" + glb.getJdlconfigbean().getInputSandbox() + ",\"" + wrappername + "\"};");
+		if(glb.getJdlconfigbean().getInputSandbox().equals(null)) 
+			f.println("InputSandbox={"+ "\"" + wrappername + "\"};");
+		else
+			f.println("InputSandbox={" + glb.getJdlconfigbean().getInputSandbox() + ",\"" + wrappername + "\"};");
 		f.println("OutputSandbox={" + glb.getJdlconfigbean().getOutputSandbox() + "};");
 		f.println("RetryCount=" + glb.getJdlconfigbean().getRetryCount() + ";");
 		f.println("ShallowRetryCount=3;");
