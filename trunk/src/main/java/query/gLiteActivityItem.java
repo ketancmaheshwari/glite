@@ -69,10 +69,10 @@ public class gLiteActivityItem extends AbstractActivityItem{
 		bean.setUI("glite.unice.fr");
 		bean.setCaDir("/etc/grid-security/certificates");
 		bean.setProxyPath("/tmp/x509up_u501");
-		bean.setVOMSDir("/home/ketan/glite-ui/glite/etc/vomses");
+		bean.setVOMSDir("/home/ketan/gliteui-3.1/glite/etc/vomses");
 		bean.setVOMSCertDir("/etc/grid-security/vomsdir/");
 		bean.setVO("biomed");
-		bean.setWMSDir("/home/ketan/glite-ui/glite/etc/wms/biomed");
+		bean.setWMSDir("/home/ketan/gliteui-3.1/glite/etc/biomed/glite_wms.conf");
 		bean.setJDLPath("/home/ketan/jlite/test/test.jdl");
 		bean.setOutputPath("/tmp/");
 		bean.setPollFrequency("20000");
