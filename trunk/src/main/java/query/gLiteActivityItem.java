@@ -84,7 +84,7 @@ public class gLiteActivityItem extends AbstractActivityItem{
 		bean.getJdlconfigbean().setStdErr("stderr");
 		bean.getJdlconfigbean().setInputSandbox("\"blah.txt\"");
 		bean.getJdlconfigbean().setOutputSandbox("\"stdout\",\"stderr\"");
-		bean.getJdlconfigbean().setExecutable("/bin/echo");
+		bean.getJdlconfigbean().setExecutable("echo");
 		bean.getJdlconfigbean().setJDLArguments("$*");
 		bean.getJdlconfigbean().setRequirements("(other.GlueCEStateStatus == \"Production\") && RegExp(\"nl\",other.GlueCEUniqueId)");
 		bean.getJdlconfigbean().setRetryCount("3");
