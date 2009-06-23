@@ -22,7 +22,18 @@ public class gLiteActivityConfigurationBean extends ActivityPortsDefinitionBean 
 	private String OutputPath;
 	private String PollFrequency;
 	private String SE;
-    private JDLConfigBean jdlconfigbean;
+	private boolean localexec;
+    
+	
+	public boolean isLocalexec() {
+		return localexec;
+	}
+
+	public void setLocalexec(boolean localexec) {
+		this.localexec = localexec;
+	}
+
+	private JDLConfigBean jdlconfigbean;
     
 	public String getWMSDir() {
 		return WMSDir;
@@ -100,14 +111,6 @@ public class gLiteActivityConfigurationBean extends ActivityPortsDefinitionBean 
 	public void setProxyPath(String proxyPath) {
 		ProxyPath = proxyPath;
 	}
-
-//	public String getDelegationID() {
-	//	return DelegationID;
-	//}
-
-	//public void setDelegationID(String delegationID) {
-	//	DelegationID = delegationID;
-	//}
 
 	public String getPollFrequency() {
 		return PollFrequency;
