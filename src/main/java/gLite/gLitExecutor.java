@@ -57,6 +57,9 @@ public class gLitExecutor {
 		for (Iterator<Object> iterator = inputportvalues.iterator(); iterator.hasNext();) {
 			// If inputName starts with 'file' transfer it to ui
 			nextinput = (String) iterator.next();
+			if (configurationBean.isLocalexec()){
+				System.out.println("Info: This Process is Marked for Local Execution!");
+			}
 			if (getPart(nextinput, 1).equals("file")) {
 				datanamemap.put(nextinput, getRandomString());
 				if (configurationBean.getUI().equals("localhost")) {
@@ -88,7 +91,6 @@ public class gLitExecutor {
 				}
 			}
 		}
-
 	}
 
 	private String createWrapperArg() {

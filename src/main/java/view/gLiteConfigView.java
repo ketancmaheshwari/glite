@@ -378,13 +378,14 @@ public class gLiteConfigView extends JPanel {
 			}
 		});
 		
+		jCheckBoxExecLocal.setSelected(configuration.isLocalexec());
 		jCheckBoxExecLocal.addFocusListener(new FocusListener(){
 			public void focusGained(FocusEvent e){
 				
 			}
 			public void focusLost(FocusEvent e) {
 				configuration.setLocalexec(jCheckBoxExecLocal.isSelected());
-				System.out.println(jCheckBoxExecLocal.isSelected());
+				//System.out.println(jCheckBoxExecLocal.isSelected());
 			}
 		});
 		
