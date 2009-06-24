@@ -68,7 +68,13 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 				
 				//generate the names of outputports and provide to the glitexecutor
 				for (OutputPort outputPort : getOutputPorts()) {
-					Object value="lfn:" + getRandomString();
+					Object value=new Object();
+					if (configurationBean.isLocalexec()){
+						value="file:" + getRandomString();
+					}else{
+						value="lfn:" + getRandomString();	
+					}
+					
 					glitexecutor.setOutParams(outputPort,value);
 					
 				}
