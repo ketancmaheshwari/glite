@@ -53,6 +53,7 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 				Map<String, T2Reference> outputData = new HashMap<String, T2Reference>();
 				
 				gLitExecutor glitexecutor = new gLitExecutor();
+				
 				try{
 					
 				for (String inputName : data.keySet()) {
@@ -74,11 +75,8 @@ public class gLiteActivity extends AbstractAsynchronousActivity<gLiteActivityCon
 					}else{
 						value="lfn:" + getRandomString();	
 					}
-					
-					glitexecutor.setOutParams(outputPort,value);
-					
+					glitexecutor.setOutParams(outputPort,value);	
 				}
-				
 				// run
 				glitexecutor.execute(configurationBean);
 				
